@@ -1,12 +1,10 @@
 """Tests for the tracing decorator (§11)."""
 from __future__ import annotations
 
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
-from app.models import AgentResult, CaseContext, SourceRef
+from app.models import AgentResult, CaseContext
 
 
 def _make_ctx() -> CaseContext:
@@ -52,7 +50,7 @@ class TestTraceDecorator:
             name = "fake_agent"
 
             @trace(prompt_version="v1")
-            async def run(self, input, ctx):  # noqa: A002
+            async def run(self, input, ctx):
                 return _make_result()
 
         mock_session = MagicMock()
@@ -76,7 +74,7 @@ class TestTraceDecorator:
             name = "persist_test"
 
             @trace(prompt_version="v1")
-            async def run(self, input, ctx):  # noqa: A002
+            async def run(self, input, ctx):
                 return _make_result()
 
         added_objects: list = []
@@ -109,7 +107,7 @@ class TestTraceDecorator:
             name = "broken"
 
             @trace(prompt_version="v1")
-            async def run(self, input, ctx):  # noqa: A002
+            async def run(self, input, ctx):
                 raise ValueError("boom")
 
         mock_session = MagicMock()

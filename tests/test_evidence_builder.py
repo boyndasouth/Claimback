@@ -4,8 +4,6 @@ from __future__ import annotations
 import json
 import pathlib
 import sys
-from decimal import Decimal
-from datetime import date
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -16,7 +14,6 @@ sys.path.insert(0, str(_REPO_ROOT / "backend"))
 from app.models import (
     AgentResult,
     CaseContext,
-    CodeIssue,
     DenialCategory,
     EvidenceBuilderInput,
     EvidenceChecklist,

@@ -18,8 +18,6 @@ from app.models import (
     AppealPlan,
     CaseContext,
     CaseStatus,
-    CodeIssue,
-    DenialCategory,
     EvidenceChecklist,
     EvidenceItem,
     ExtractedClaim,
@@ -167,7 +165,7 @@ class TestDraftingStageLoop:
     def test_one_rewrite_callback_sequence(self) -> None:
         """One rewrite: [(DRAFTING,0), (VERIFYING,0), (DRAFTING,1), (VERIFYING,1)]."""
         from app.models import AgentResult
-        from pipeline.drafting import DraftingResult, run_drafting_stage
+        from pipeline.drafting import run_drafting_stage
 
         status_calls = []
 

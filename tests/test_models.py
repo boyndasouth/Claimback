@@ -1,10 +1,9 @@
 """Unit tests for Pydantic models (§6) and the synthetic data generator (§9)."""
 from __future__ import annotations
 
-import json
 import pathlib
 import sys
-from datetime import date, timedelta
+from datetime import date
 from decimal import Decimal
 
 import pytest
@@ -27,7 +26,6 @@ from app.models import (
     SourceRef,
     SuccessEstimate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Base / shared model tests
@@ -272,17 +270,12 @@ class TestAgentResult:
 # ---------------------------------------------------------------------------
 
 
+
 from app.models import (
-    CheckerInput,
-    EvidenceBuilderInput,
     EvidenceChecklist,
     EvidenceItem,
     SuccessScorerInput,
-    WriterInput,
-    WriterRetryInput,
 )
-from datetime import date as _date
-from decimal import Decimal as _Decimal
 
 
 class TestEvidenceChecklist:

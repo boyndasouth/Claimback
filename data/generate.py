@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import pathlib
 import random
 import sys
@@ -33,7 +32,7 @@ from decimal import Decimal
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
-from faker import Faker  # noqa: E402
+from faker import Faker
 
 try:
     from jinja2 import Environment, FileSystemLoader
@@ -483,12 +482,12 @@ def generate(seed: int, count: int) -> None:
     print(f"  policies/        : {len(payers_pool)} .{ext} files → {policy_dir}")
     print(f"  state_rules/     : {len(state_rules)} .json files → {state_dir}")
     print(f"  cases.jsonl      : {jsonl_path}")
-    print(f"\nDifficulty injections:")
+    print("\nDifficulty injections:")
     print(f"  coding errors    : {n_coding}/{count} ({100*n_coding/count:.0f}%)")
     print(f"  missing code     : {n_missing}/{count} ({100*n_missing/count:.0f}%)")
     print(f"  low quality scan : {n_low}/{count} ({100*n_low/count:.0f}%)")
     print(f"  expedited elig.  : {n_exp}/{count} ({100*n_exp/count:.0f}%)")
-    print(f"\nSplits:")
+    print("\nSplits:")
     print(f"  eval             : {n_eval}")
     print(f"  held_out         : {n_held}")
 

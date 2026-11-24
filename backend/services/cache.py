@@ -11,6 +11,7 @@ The ``input_hash`` is computed by :func:`hash_input` (re-exported from
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import select
 
@@ -27,7 +28,7 @@ async def get_cached_result(
     case_id: str,
     agent_name: str,
     input_hash: str,
-) -> dict | None:
+) -> dict[str, Any] | None:
     """Return the cached output dict for a previous agent run, or ``None`` if not found.
 
     Parameters
@@ -53,14 +54,14 @@ async def get_cached_result(
             )
             result = await session.execute(stmt)
             row = result.scalar_one_or_none()
-            if row is not None:
+            if isinstance(row, dict):
                 logger.debug(
                     "Cache hit: case=%s agent=%s hash=%s",
                     case_id,
                     agent_name,
                     input_hash,
                 )
-                return row  # type: ignore[return-value]
+                return row
     except Exception as exc:
         logger.warning("Cache lookup failed: %s", exc)
     return None

@@ -42,22 +42,18 @@ TARGET_QUALITY = 4.0
 
 
 def _make_smoke_case(idx: int) -> dict[str, Any]:
+    from datetime import date
+
     from app.models import (
-        AppealDraft,
         AppealPlan,
         CaseContext,
-        CheckerInput,
-        CodeIssue,
-        DenialCategory,
         EvidenceChecklist,
         EvidenceItem,
         ExtractedClaim,
-        FlaggedSpan,
         PolicyClause,
         SourceRef,
         WriterInput,
     )
-    from datetime import date, timedelta
 
     src = SourceRef(
         clause_id=f"c{idx}",
@@ -159,9 +155,9 @@ def _mock_judge_response() -> str:
 
 
 async def _run_one_case(fixture: dict, use_real: bool) -> dict[str, Any]:
-    from app.models import AppealDraft, CheckerInput, SourceRef
     from agents.appeal_writer import AppealWriter
     from agents.groundedness_checker import GroundednessChecker
+    from app.models import CheckerInput
 
     writer = AppealWriter()
     checker = GroundednessChecker()
@@ -174,7 +170,8 @@ async def _run_one_case(fixture: dict, use_real: bool) -> dict[str, Any]:
 
     if not use_real:
         # Build mock client inline and patch get_client for the duration of this call
-        from unittest.mock import AsyncMock, MagicMock, patch as _patch
+        from unittest.mock import AsyncMock, MagicMock
+        from unittest.mock import patch as _patch
 
         call_count = [0]
 
@@ -265,6 +262,7 @@ async def _judge_quality(body_markdown: str, ctx, use_real: bool) -> float:
         return 4.0
 
     import re as _re
+
     from jinja2 import Environment, FileSystemLoader
     from services.watsonx import get_client
 

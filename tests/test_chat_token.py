@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
-import services.chat_token as ct  # noqa: E402
+import services.chat_token as ct
 
 
 @pytest.fixture(autouse=True)

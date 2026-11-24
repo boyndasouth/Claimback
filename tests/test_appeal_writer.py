@@ -19,8 +19,6 @@ from app.models import (
     AppealDraft,
     AppealPlan,
     CaseContext,
-    CodeIssue,
-    DenialCategory,
     EvidenceChecklist,
     EvidenceItem,
     ExtractedClaim,

@@ -21,10 +21,9 @@ from app.models import (
     EvidenceBuilderInput,
     EvidenceChecklist,
     EvidenceItem,
-    SourceRef,
 )
-from services.tracing import trace
 from services.json_utils import extract_json_block
+from services.tracing import trace
 from services.watsonx import get_client
 
 logger = logging.getLogger(__name__)

@@ -12,9 +12,10 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
 
-from app.models import AgentResult, AppealPlan, CaseContext, SourceRef
+from app.models import AgentResult, AppealPlan, CaseContext
 from services.tracing import trace
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class FollowupTracker:
         self,
         input: AppealPlan,  # noqa: A002
         ctx: CaseContext,
-    ) -> AgentResult[list[dict]]:
+    ) -> AgentResult[list[dict[str, Any]]]:
         """Schedule reminders from *input* (AppealPlan).
 
         Parameters
@@ -53,13 +54,13 @@ class FollowupTracker:
         from db.models import Reminder
 
         start = time.monotonic()
-        created: list[dict] = []
+        created: list[dict[str, Any]] = []
 
         async with AsyncSessionFactory() as session:
             # Internal appeal deadline (always present)
             due_at_internal = datetime.combine(
                 input.internal_appeal_deadline, datetime.min.time()
-            ).replace(tzinfo=timezone.utc)
+            ).replace(tzinfo=UTC)
             r1 = Reminder(
                 id=str(uuid.uuid4()),
                 case_id=ctx.case_id,
@@ -74,7 +75,7 @@ class FollowupTracker:
             if input.external_review_available and input.external_review_deadline:
                 due_at_ext = datetime.combine(
                     input.external_review_deadline, datetime.min.time()
-                ).replace(tzinfo=timezone.utc)
+                ).replace(tzinfo=UTC)
                 r2 = Reminder(
                     id=str(uuid.uuid4()),
                     case_id=ctx.case_id,
@@ -109,7 +110,7 @@ class FollowupTracker:
 
         latency_ms = int((time.monotonic() - start) * 1000)
 
-        return AgentResult[list[dict]](
+        return AgentResult[list[dict[str, Any]]](
             output=created,
             confidence=1.0,
             sources=[],

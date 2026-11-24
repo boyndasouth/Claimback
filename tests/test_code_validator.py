@@ -5,7 +5,6 @@ from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from app.models import CaseContext, CodeIssue, ExtractedClaim
 
 
@@ -226,7 +225,7 @@ class TestCodeValidatorSourceRef:
 class TestCodeIssueModel:
     def test_code_issue_all_issue_types_valid(self) -> None:
         """All five issue_type literals must be accepted by the CodeIssue model."""
-        from app.models import CodeIssue, SourceRef
+        from app.models import SourceRef
 
         for itype in ("invalid_pair", "unknown_code", "missing_modifier", "unbundling", "diagnosis_not_supporting"):
             issue = CodeIssue(

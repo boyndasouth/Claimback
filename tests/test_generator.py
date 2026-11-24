@@ -1,11 +1,8 @@
 """Unit tests for the synthetic data generator (§9)."""
 from __future__ import annotations
 
-import json
 import pathlib
 import sys
-
-import pytest
 
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
@@ -16,7 +13,6 @@ sys.path.insert(0, str(_DATA_DIR))
 
 import generate as gen  # type: ignore[import]
 from app.models import ExtractedClaim
-
 
 # ---------------------------------------------------------------------------
 # Fixture loading
@@ -56,6 +52,7 @@ class TestFixtures:
 class TestBuildCase:
     def _get_data(self):
         import random
+
         from faker import Faker
         rng = random.Random(42)
         faker = Faker()
@@ -113,6 +110,7 @@ class TestBuildCase:
     def test_coding_error_uses_invalid_cpt_icd10_pair(self) -> None:
         """When coding_error=True the CPT/ICD-10 pair must NOT be in valid_pairs."""
         import random
+
         from faker import Faker
 
         # Force a coding error by patching rng to always return < 0.20
@@ -159,9 +157,8 @@ class TestBuildCase:
 class TestDeterminism:
     def test_same_seed_same_output(self) -> None:
         """Running generate() twice with the same seed must produce identical cases.jsonl."""
-        import os
-        import tempfile
         import random
+
         from faker import Faker
 
         # Use in-memory generation (no file writes) by calling _build_case deterministically
@@ -193,6 +190,7 @@ class TestDeterminism:
 
     def test_different_seeds_differ(self) -> None:
         import random
+
         from faker import Faker
 
         def _first_claim_id(seed: int) -> str:
@@ -221,6 +219,7 @@ class TestDifficultyPercentages:
 
     def _generate_cases(self, seed: int = 42, count: int = 250) -> list[dict]:
         import random
+
         from faker import Faker
         rng = random.Random(seed)
         faker = Faker()

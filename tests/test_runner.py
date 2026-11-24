@@ -4,10 +4,9 @@ from __future__ import annotations
 import asyncio
 from datetime import date
 from decimal import Decimal
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from app.models import (
     AgentResult,
     AppealPlan,

@@ -32,7 +32,8 @@ _CONFIG_PATH = Path(__file__).parent.parent / "config" / "models.yaml"
 
 def _load_model_ids() -> dict[str, str]:
     with open(_CONFIG_PATH) as fh:
-        return yaml.safe_load(fh)
+        data: dict[str, str] = yaml.safe_load(fh)
+    return data
 
 
 MODEL_IDS: dict[str, str] = _load_model_ids()
@@ -95,7 +96,9 @@ def _is_transient(exc: BaseException) -> bool:
     """Return True for errors that are worth retrying."""
     # Import lazily so we can mock without the SDK installed
     try:
-        from ibm_watsonx_ai.foundation_models.utils.exceptions import ModelInferenceException  # type: ignore[import]
+        from ibm_watsonx_ai.foundation_models.utils.exceptions import (
+            ModelInferenceException,
+        )
 
         if isinstance(exc, ModelInferenceException):
             return True
@@ -218,7 +221,7 @@ class WatsonxClient:
             )
 
         try:
-            vectors: list[list[float]] = await _attempt()  # type: ignore[assignment]
+            vectors: list[list[float]] = await _attempt()
             _circuit.record_success(tier)
             return vectors
         except RetryError as exc:
@@ -230,8 +233,10 @@ class WatsonxClient:
         model_id = MODEL_IDS[tier]
 
         def _sync_embed() -> list[list[float]]:
-            from ibm_watsonx_ai import APIClient, Credentials  # type: ignore[import]
-            from ibm_watsonx_ai.foundation_models.embeddings import Embeddings  # type: ignore[import]
+            from ibm_watsonx_ai import APIClient, Credentials
+            from ibm_watsonx_ai.foundation_models.embeddings import (
+                Embeddings,
+            )
 
             creds = Credentials(url=self._url, api_key=self._api_key)
             client = APIClient(credentials=creds, project_id=self._project_id)
@@ -243,7 +248,7 @@ class WatsonxClient:
             )
             response = emb.embed_documents(texts)
             # response is list[list[float]] (one vector per text)
-            return response  # type: ignore[return-value]
+            return response
 
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _sync_embed)
@@ -272,7 +277,7 @@ class WatsonxClient:
                 timeout=_TIMEOUT_SECONDS,
             )
 
-        return await _attempt()  # type: ignore[return-value]
+        return await _attempt()
 
     async def _call_sdk(
         self,
@@ -284,8 +289,8 @@ class WatsonxClient:
         model_id = MODEL_IDS[model_tier]
 
         def _sync_call() -> tuple[str, int, int]:
-            from ibm_watsonx_ai import APIClient, Credentials  # type: ignore[import]
-            from ibm_watsonx_ai.foundation_models import ModelInference  # type: ignore[import]
+            from ibm_watsonx_ai import APIClient, Credentials
+            from ibm_watsonx_ai.foundation_models import ModelInference
 
             creds = Credentials(url=self._url, api_key=self._api_key)
             client = APIClient(credentials=creds, project_id=self._project_id)

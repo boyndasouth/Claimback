@@ -26,7 +26,6 @@ import logging
 import pathlib
 from datetime import date, timedelta
 from decimal import Decimal
-from typing import Literal
 
 from pydantic import BaseModel
 
@@ -97,9 +96,9 @@ def _compute_deadlines(
 
     All deadlines are calendar days from denial_date.
     """
-    internal_days = int(rule["internal_days"])  # type: ignore[arg-type]
+    internal_days = int(str(rule["internal_days"]))
     external_available = bool(rule["external_review_available"])
-    external_days = int(rule["external_days"]) if rule.get("external_days") else 0
+    external_days = int(str(rule["external_days"])) if rule.get("external_days") else 0
 
     internal_deadline = denial_date + timedelta(days=internal_days)
 
@@ -138,7 +137,7 @@ class RegulationDeadline:
                 f"Case {ctx.case_id}: denial_date is required to compute appeal deadlines."
             )
 
-        rule = _STATE_RULES.get(claim.state, _ERISA_DEFAULTS)  # type: ignore[arg-type]
+        rule = _STATE_RULES.get(claim.state, _ERISA_DEFAULTS)
         state_name = str(rule.get("state_name", "Federal ERISA Default"))
         state_code = str(rule.get("state", claim.state))
 

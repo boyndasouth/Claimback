@@ -9,16 +9,15 @@ Day-4 additions:
 from __future__ import annotations
 
 import uuid
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest.mock import patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.pool import StaticPool
-
 
 # ── Minimal test-only SQLite schema ──────────────────────────────────────────
 # The full ORM uses Postgres-specific types (pgvector, tsvector, JSONB) that

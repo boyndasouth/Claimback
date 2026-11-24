@@ -1,12 +1,10 @@
 """Tests for Agent 3 — Document Extractor (including Docling fallback)."""
 from __future__ import annotations
 
-import json
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from app.models import CaseContext, ExtractedClaim
 
 _SAMPLE_CLAIM = ExtractedClaim(

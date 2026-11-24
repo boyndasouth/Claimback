@@ -14,9 +14,9 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from app.models import AgentResult, CaseContext, DenialCategory, ExtractedClaim, SourceRef
-from services.tracing import trace
+from app.models import AgentResult, CaseContext, DenialCategory, ExtractedClaim
 from services.json_utils import extract_json_block
+from services.tracing import trace
 from services.watsonx import get_client
 
 logger = logging.getLogger(__name__)

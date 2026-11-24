@@ -27,8 +27,10 @@ from functools import wraps
 from typing import Any, TypeVar
 
 # Import at module level so tests can monkeypatch these names on this module.
-from db import AsyncSessionFactory  # noqa: E402
-from db.models import AgentRun  # noqa: E402
+# They look unused but are read at runtime via `services.tracing.<name>` in the
+# wrapper below — removing them (e.g. by `ruff --fix`) breaks every agent call.
+from db import AsyncSessionFactory as AsyncSessionFactory  # noqa: E402
+from db.models import AgentRun as AgentRun  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ def _get_langfuse() -> Any | None:
         return None
 
     try:
-        from langfuse import Langfuse  # type: ignore[import]
+        from langfuse import Langfuse
 
         _langfuse = Langfuse(public_key=pub, secret_key=sec)
         logger.info("Langfuse tracing enabled")

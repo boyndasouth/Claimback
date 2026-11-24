@@ -6,14 +6,12 @@ in downstream prompts (SPEC §19 acceptance criterion).
 from __future__ import annotations
 
 import json
-import os
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from cryptography.fernet import Fernet
-
 from app.models import CaseContext, ExtractedClaim
+from cryptography.fernet import Fernet
 
 # Generate a test Fernet key
 _TEST_KEY = Fernet.generate_key().decode()

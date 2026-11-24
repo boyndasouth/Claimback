@@ -7,6 +7,7 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
+
 def normalize_database_url(url: str) -> str:
     """Make a hosted Postgres URL usable by SQLAlchemy's asyncpg driver.
 

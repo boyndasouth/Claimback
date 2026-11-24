@@ -12,19 +12,16 @@ The agent implements the :class:`~app.models.Agent` protocol and is wrapped with
 """
 from __future__ import annotations
 
-import json
 import logging
 import re
 import time
-import uuid
-from decimal import Decimal
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from app.models import AgentResult, CaseContext, ExtractedClaim, SourceRef
-from services.tracing import trace
+from app.models import AgentResult, CaseContext, ExtractedClaim
 from services.json_utils import extract_json_block
+from services.tracing import trace
 from services.watsonx import get_client
 
 logger = logging.getLogger(__name__)
@@ -56,7 +53,7 @@ def _extract_text_docling(source: str | bytes) -> str:
         If Docling is not installed or the extraction fails.
     """
     try:
-        from docling.document_converter import DocumentConverter  # type: ignore[import]
+        from docling.document_converter import DocumentConverter
     except ImportError as exc:
         raise RuntimeError(
             "Docling is not installed.  Add 'docling' to your dependencies."

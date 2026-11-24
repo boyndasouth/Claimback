@@ -7,8 +7,8 @@ import sys
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
-from app.models import AppealPlan, SuccessEstimate  # noqa: E402
-from services.case_summary import _canonical, _parse_agent_output  # noqa: E402
+from app.models import AppealPlan, SuccessEstimate
+from services.case_summary import _canonical, _parse_agent_output
 
 
 def test_canonical_accepts_both_name_styles():

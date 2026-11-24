@@ -34,9 +34,9 @@ from sqlalchemy import desc, select
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
-from db import AsyncSessionFactory  # noqa: E402  (must come after sys.path)
-from db.models import AgentRun, Case, Draft  # noqa: E402
-from services.case_summary import get_case_summary  # noqa: E402
+from db import AsyncSessionFactory
+from db.models import AgentRun, Case, Draft
+from services.case_summary import get_case_summary
 
 logger = logging.getLogger("record_replay")
 

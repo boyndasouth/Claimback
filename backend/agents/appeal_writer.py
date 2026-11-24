@@ -23,8 +23,8 @@ from app.models import (
     WriterInput,
     WriterRetryInput,
 )
-from services.tracing import trace
 from services.json_utils import extract_json_block
+from services.tracing import trace
 from services.watsonx import get_client
 
 logger = logging.getLogger(__name__)
@@ -79,10 +79,22 @@ class AppealWriter:
             Ambient case context.
         """
         start = time.monotonic()
-        is_retry = isinstance(input, WriterRetryInput)
-        base = input.base if is_retry else input
-        previous_version = input.previous_draft.version if is_retry else 0
-        flagged_spans: list[FlaggedSpan] = input.flagged_spans if is_retry else []
+        # isinstance() branches (not a bool flag) so the type checker can narrow
+        # WriterInput | WriterRetryInput.
+        base: WriterInput
+        flagged_spans: list[FlaggedSpan]
+        if isinstance(input, WriterRetryInput):
+            is_retry = True
+            base = input.base
+            previous_version = input.previous_draft.version
+            previous_draft_body = input.previous_draft.body_markdown
+            flagged_spans = input.flagged_spans
+        else:
+            is_retry = False
+            base = input
+            previous_version = 0
+            previous_draft_body = ""
+            flagged_spans = []
 
         # ── Number the retrieved clauses S1..Sn ───────────────────────────────
         # The model cites by key only; citations are built here from the real
@@ -100,7 +112,7 @@ class AppealWriter:
         raw_template = template.render(
             is_retry=is_retry,
             flagged_spans=flagged_spans,
-            previous_draft_body=input.previous_draft.body_markdown if is_retry else "",
+            previous_draft_body=previous_draft_body,
             category=claim.denial_reason_text,
             claim_facts={
                 "claim_id": claim.claim_id,

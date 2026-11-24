@@ -17,11 +17,13 @@ Implements all routes:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import pathlib
 import uuid
-from datetime import datetime, timezone
+from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
@@ -120,20 +122,18 @@ class TraceEvent(BaseModel):
 # Each SSE connection gets its own Queue.  When status changes, all queues for
 # that case receive the event.  This is intentionally simple — Day 7 can swap
 # to Redis pub/sub for multi-worker deployments.
-_sse_queues: dict[str, list[asyncio.Queue]] = {}
+_sse_queues: dict[str, list[asyncio.Queue[dict[str, Any]]]] = {}
 
 
 def _broadcast(case_id: str, event: dict[str, Any]) -> None:
     """Push an SSE event to all connected clients for this case."""
     queues = _sse_queues.get(case_id, [])
     for q in queues:
-        try:
+        with contextlib.suppress(asyncio.QueueFull):  # slow consumer — drop event
             q.put_nowait(event)
-        except asyncio.QueueFull:
-            pass  # slow consumer — drop event
 
 
-def broadcast_status(case_id: str, new_status: str, detail: dict | None = None) -> None:
+def broadcast_status(case_id: str, new_status: str, detail: dict[str, Any] | None = None) -> None:
     """Public helper for the pipeline background task to emit SSE events."""
     _broadcast(case_id, {"type": "status", "status": new_status, **(detail or {})})
 
@@ -146,7 +146,9 @@ _TERMINAL = {
 }
 
 
-async def _sse_generator(case_id: str, request: Request, current_status: str | None = None):
+async def _sse_generator(
+    case_id: str, request: Request, current_status: str | None = None
+) -> AsyncIterator[str]:
     """Async generator that yields SSE-formatted strings.
 
     The case's current status is sent first, so a client that connects late
@@ -154,7 +156,7 @@ async def _sse_generator(case_id: str, request: Request, current_status: str | N
     for events that were broadcast before it subscribed. If the case is
     already finished, that first event is the last.
     """
-    q: asyncio.Queue = asyncio.Queue(maxsize=64)
+    q: asyncio.Queue[dict[str, Any]] = asyncio.Queue(maxsize=64)
     _sse_queues.setdefault(case_id, []).append(q)
     try:
         if current_status:
@@ -171,7 +173,7 @@ async def _sse_generator(case_id: str, request: Request, current_status: str | N
                 # Terminal events: close the stream
                 if event.get("status") in _TERMINAL:
                     break
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 yield ": keepalive\n\n"
     finally:
         queues = _sse_queues.get(case_id, [])
@@ -209,7 +211,7 @@ async def _run_pipeline_with_sse(case_id: str, user_id: str, denial_text: str) -
                 await session.commit()
         broadcast_status(case_id, new_status)
 
-    async def _on_status(new_status: CaseStatus, detail: dict) -> None:
+    async def _on_status(new_status: CaseStatus, detail: dict[str, Any]) -> None:
         await _set_status(new_status)
         _broadcast(case_id, {"type": "status", "status": str(new_status), **detail})
 
@@ -657,7 +659,7 @@ async def api_cases_approve(
         )
 
     draft.approved_by = body.approved_by
-    draft.approved_at = datetime.now(timezone.utc)
+    draft.approved_at = datetime.now(UTC)
     case.status = CaseStatus.READY_TO_SEND
     await session.commit()
     broadcast_status(case_id, CaseStatus.READY_TO_SEND)
@@ -766,7 +768,8 @@ async def api_replay_get(case_id: str) -> dict[str, Any]:
             detail="Replay trace not found",
         )
     try:
-        return json.loads(fixture_path.read_text(encoding="utf-8"))
+        fixture: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+        return fixture
     except Exception as exc:
         logger.error("Failed to read replay fixture %s: %s", fixture_path, exc)
         raise HTTPException(

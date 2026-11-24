@@ -6,7 +6,6 @@ stubbed.  Asserts that ``_set_status`` is eventually called with
 """
 from __future__ import annotations
 
-import asyncio
 import pathlib
 import sys
 import uuid
@@ -23,13 +22,11 @@ from app.models import (
     AgentResult,
     AppealDraft,
     AppealPlan,
-    CaseContext,
     CaseStatus,
     DenialCategory,
     EvidenceChecklist,
     EvidenceItem,
     ExtractedClaim,
-    FlaggedSpan,
     GroundingReport,
     PolicyClause,
     SourceRef,
@@ -95,7 +92,6 @@ async def test_pipeline_reaches_awaiting_approval():
     )
     grounding = GroundingReport(passed=True, flagged_spans=[], groundedness_score=0.98)
     estimate = SuccessEstimate(probability=0.72, top_factors=[], explanation="Good chance.")
-    from app.models import EvidenceChecklist, EvidenceItem
     checklist = EvidenceChecklist(items=[
         EvidenceItem(item_id="E1", description="LON", rationale="rebuts", priority="high")
     ])
@@ -158,8 +154,8 @@ async def test_pipeline_reaches_awaiting_approval():
     mock_factory.return_value = mock_session
 
     # Build a mock AnalysisResult to return from run_analysis_stage
-    from pipeline.runner import AnalysisResult
     from app.models import AgentResult
+    from pipeline.runner import AnalysisResult
     mock_analysis = AnalysisResult(
         policy_clauses=AgentResult(
             output=[clause], confidence=0.9, sources=[src],

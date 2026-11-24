@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
@@ -159,7 +159,7 @@ async def _run_pipeline_background(case_id: str, user_id: str, denial_text: str)
                 case.status = new_status
                 await session.commit()
 
-    async def _on_status(new_status: CaseStatus, detail: dict) -> None:
+    async def _on_status(new_status: CaseStatus, detail: dict[str, Any]) -> None:
         """Status callback passed into run_drafting_stage."""
         await _set_status(new_status)
         logger.info(
@@ -439,7 +439,7 @@ async def case_approve(
         )
 
     draft.approved_by = body.approved_by
-    draft.approved_at = datetime.now(timezone.utc)
+    draft.approved_at = datetime.now(UTC)
     case.status = CaseStatus.READY_TO_SEND
     await session.commit()
     return {"status": "approved", "case_id": body.case_id}
@@ -464,7 +464,7 @@ async def case_schedule_followup(
     try:
         due_at = datetime.fromisoformat(body.due_at)
         if due_at.tzinfo is None:
-            due_at = due_at.replace(tzinfo=timezone.utc)
+            due_at = due_at.replace(tzinfo=UTC)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

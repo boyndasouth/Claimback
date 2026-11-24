@@ -5,8 +5,6 @@ import pathlib
 import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 

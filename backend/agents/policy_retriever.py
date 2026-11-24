@@ -119,7 +119,7 @@ class PolicyRetriever:
                     "top_k": _TOP_K,
                 },
             )
-            result_rows: list[Any] = rows.fetchall()
+            result_rows: list[Any] = list(rows.fetchall())
 
         clauses: list[PolicyClause] = []
         for row in result_rows:

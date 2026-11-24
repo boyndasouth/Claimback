@@ -1,8 +1,7 @@
 """Tests for WatsonxClient — timeout, retry, and circuit breaker (§16)."""
 from __future__ import annotations
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -33,7 +32,7 @@ def env_vars(monkeypatch):
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 
-def _make_client(env_vars):  # noqa: ARG001
+def _make_client(env_vars):
     from services.watsonx import WatsonxClient
 
     return WatsonxClient()
@@ -126,7 +125,7 @@ class TestRetry:
 class TestCircuitBreaker:
     async def test_circuit_opens_after_threshold(self, env_vars):
         """After 5 consecutive failures, the circuit should open."""
-        from services.watsonx import CircuitOpenError, _CIRCUIT_FAILURE_THRESHOLD
+        from services.watsonx import _CIRCUIT_FAILURE_THRESHOLD, CircuitOpenError
 
         client = _make_client(env_vars)
 
@@ -145,6 +144,7 @@ class TestCircuitBreaker:
     async def test_circuit_reset_after_timeout(self, env_vars, monkeypatch):
         """Circuit should reset after _CIRCUIT_RESET_SECONDS have elapsed."""
         import time
+
         import services.watsonx as wx
 
         # Manually open the circuit

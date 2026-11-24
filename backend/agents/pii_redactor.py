@@ -23,16 +23,14 @@ import logging
 import os
 import re
 import time
-import uuid
 from collections import defaultdict
-from decimal import Decimal
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from app.models import AgentResult, CaseContext, ExtractedClaim, SourceRef
-from services.tracing import trace
+from app.models import AgentResult, CaseContext, ExtractedClaim
 from services.json_utils import extract_json_block
+from services.tracing import trace
 from services.watsonx import get_client
 
 logger = logging.getLogger(__name__)
@@ -43,8 +41,8 @@ _JINJA_ENV = Environment(loader=FileSystemLoader(str(_PROMPTS_DIR)), autoescape=
 # ── Fernet encryption ─────────────────────────────────────────────────────────
 
 
-def _get_fernet() -> "Fernet":  # type: ignore[name-defined]  # noqa: F821
-    from cryptography.fernet import Fernet  # type: ignore[import]
+def _get_fernet() -> Fernet:  # type: ignore[name-defined]  # noqa: F821
+    from cryptography.fernet import Fernet
 
     key = os.environ.get("PII_VAULT_KEY", "")
     if not key:
@@ -56,7 +54,8 @@ def _encrypt_token_map(token_map: dict[str, str]) -> str:
     """Serialize and Fernet-encrypt the token map; return a base64 string."""
     fernet = _get_fernet()
     plaintext = json.dumps(token_map).encode()
-    return fernet.encrypt(plaintext).decode()
+    encrypted: str = fernet.encrypt(plaintext).decode()
+    return encrypted
 
 
 # ── Regex PII patterns ────────────────────────────────────────────────────────
@@ -92,7 +91,7 @@ def _apply_regex_pass(text: str, counters: dict[str, int]) -> tuple[str, dict[st
     """Replace regex-matched PII spans with tokens; return (redacted_text, token_map)."""
     token_map: dict[str, str] = {}
     for pattern, pii_type in _PII_PATTERNS:
-        def replacer(m: re.Match, _type: str = pii_type) -> str:
+        def replacer(m: re.Match[str], _type: str = pii_type) -> str:
             span = m.group(0)
             if span in token_map:
                 return token_map[span]
@@ -237,9 +236,10 @@ class PiiRedactor:
 
 async def _upsert_pii_vault(case_id: str, encrypted_map: str) -> None:
     """Insert or replace the PiiVault row for *case_id*."""
+    from sqlalchemy import select
+
     from db import AsyncSessionFactory
     from db.models import PiiVault
-    from sqlalchemy import select
 
     try:
         async with AsyncSessionFactory() as session:

@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 import itertools
-import sys
 import pathlib
+import sys
 import time
-
-import pytest
 
 _BACKEND = str(pathlib.Path(__file__).resolve().parent.parent / "backend")
 if _BACKEND not in sys.path:
     sys.path.insert(0, _BACKEND)
 
-from services.rate_limiter import _buckets, check_rate_limit, retry_after_seconds  # noqa: E402
+from services.rate_limiter import (
+    _buckets,
+    check_rate_limit,
+    retry_after_seconds,
+)
 
 _ip_counter = itertools.count(1)
 

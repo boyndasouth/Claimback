@@ -5,8 +5,6 @@ import pathlib
 import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "backend"))
 
@@ -27,8 +25,9 @@ class TestGetCachedResult:
         mock_factory.return_value = mock_session
 
         with patch("services.cache.AsyncSessionFactory", mock_factory):
-            from services.cache import get_cached_result
             import asyncio
+
+            from services.cache import get_cached_result
             result = asyncio.run(
                 get_cached_result("case-1", "success_scorer", "abc123")
             )
@@ -48,8 +47,9 @@ class TestGetCachedResult:
         mock_factory.return_value = mock_session
 
         with patch("services.cache.AsyncSessionFactory", mock_factory):
-            from services.cache import get_cached_result
             import asyncio
+
+            from services.cache import get_cached_result
             result = asyncio.run(
                 get_cached_result("case-1", "success_scorer", "abc123")
             )
@@ -67,8 +67,9 @@ class TestGetCachedResult:
         mock_factory.return_value = mock_session
 
         with patch("services.cache.AsyncSessionFactory", mock_factory):
-            from services.cache import get_cached_result
             import asyncio
+
+            from services.cache import get_cached_result
             result = asyncio.run(
                 get_cached_result("case-1", "appeal_writer", "xyz")
             )

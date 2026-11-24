@@ -130,7 +130,7 @@ def _extract_text(path: pathlib.Path) -> str:
     """Extract plain text from a PDF or HTML policy file."""
     if path.suffix.lower() == ".pdf":
         try:
-            from docling.document_converter import DocumentConverter  # type: ignore[import]
+            from docling.document_converter import DocumentConverter
 
             converter = DocumentConverter()
             result = converter.convert(str(path))
@@ -296,7 +296,7 @@ async def _ingest_all() -> None:
                 batch = new_chunks[i : i + _EMBED_BATCH]
                 texts = [c["text"] for c in batch]
                 vectors = await client.embed(texts)
-                for chunk, vec in zip(batch, vectors):
+                for chunk, vec in zip(batch, vectors, strict=True):
                     h = _content_hash(chunk["text"], doc_id)
                     existing.add(h)  # prevent re-ingest within this run
                     chunk_rows.append({

@@ -6,7 +6,6 @@ explanation.  Falls back to ``probability=0.5`` when the model file is absent.
 """
 from __future__ import annotations
 
-import json
 import logging
 import re
 import time
@@ -17,7 +16,6 @@ from jinja2 import Environment, FileSystemLoader
 from app.models import (
     AgentResult,
     CaseContext,
-    SourceRef,
     SuccessEstimate,
     SuccessScorerInput,
 )
@@ -54,7 +52,7 @@ _booster = None
 _feature_names: list[str] = []
 
 try:
-    import joblib  # type: ignore[import]
+    import joblib
 
     if _MODEL_PATH.exists():
         _booster = joblib.load(_MODEL_PATH)
@@ -127,7 +125,7 @@ class SuccessScorer:
 
         # ── Predict probability ───────────────────────────────────────────────
         if _booster is not None:
-            import numpy as np  # type: ignore[import]
+            import numpy as np
 
             fvec = _build_feature_vector(input)
             X = np.asarray([fvec], dtype=np.float32)
@@ -149,7 +147,7 @@ class SuccessScorer:
                 feat_names = _feature_names or _build_feature_names()
                 paired = [
                     (name, float(c))
-                    for name, c, v in zip(feat_names, contrib[:-1], fvec)  # last = bias
+                    for name, c, v in zip(feat_names, contrib[:-1], fvec, strict=True)  # last = bias
                     # one-hot columns that are 0 for this case aren't "factors" of it
                     if v != 0.0 or not name.startswith(("cat_", "plan_", "state_"))
                 ]

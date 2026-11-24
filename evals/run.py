@@ -60,8 +60,6 @@ import asyncio
 import datetime
 import json
 import logging
-import os
-import re
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -176,7 +174,7 @@ def _load_fixtures(fixture_dir: Path, subset: int | None) -> list[dict[str, Any]
 
 def _synthetic_smoke_fixtures(n: int) -> list[dict[str, Any]]:
     """Generate *n* minimal synthetic fixtures for CI smoke runs."""
-    from app.models import DenialCategory  # noqa: PLC0415
+    from app.models import DenialCategory
 
     categories = list(DenialCategory)
     plan_types = ["employer", "marketplace", "medicaid", "medicare_advantage"]
@@ -223,7 +221,6 @@ def _synthetic_smoke_day3_fixtures(n: int) -> list[dict[str, Any]]:
     These do NOT require policy chunks in the DB — they test Agent 7 and 8
     deterministic logic against known ground truth.
     """
-    from app.models import DenialCategory  # noqa: PLC0415
 
     states = ["CA", "TX", "NY", "FL", "WA", "IL", "PA", "OH", "GA", "NC"]
     # State deadlines from fixtures (internal_days)
@@ -236,7 +233,7 @@ def _synthetic_smoke_day3_fixtures(n: int) -> list[dict[str, Any]]:
         state = states[i % len(states)]
         denial_date = f"2024-0{(i % 9) + 1}-01"
         internal_days = state_deadlines.get(state, 180)
-        from datetime import date, timedelta  # noqa: PLC0415
+        from datetime import date, timedelta
         d = date.fromisoformat(denial_date)
         expected_deadline = (d + timedelta(days=internal_days)).isoformat()
         # 20% of cases have a coding error (injected unknown CPT)
@@ -278,8 +275,9 @@ async def _run_case_day2(
     classifier: Any,
 ) -> dict[str, Any]:
     """Run agents 3→4→5 on a single fixture and return per-case metrics."""
-    from app.models import CaseContext  # noqa: PLC0415
     import uuid
+
+    from app.models import CaseContext
 
     ctx = CaseContext(
         case_id=fixture.get("case_id", str(uuid.uuid4())),
@@ -347,9 +345,10 @@ async def _run_case_day3(
 
     *retriever* may be None when running in --day3-only mode without a live DB.
     """
-    from app.models import CaseContext, DenialCategory, ExtractedClaim  # noqa: PLC0415
-    from agents.regulation_deadline import DeadlineInput  # noqa: PLC0415
     import uuid
+
+    from agents.regulation_deadline import DeadlineInput
+    from app.models import CaseContext, DenialCategory, ExtractedClaim
 
     ctx = CaseContext(
         case_id=fixture.get("case_id", str(uuid.uuid4())),
@@ -375,7 +374,7 @@ async def _run_case_day3(
 
     try:
         # Build a minimal ExtractedClaim from ground truth
-        from decimal import Decimal  # noqa: PLC0415
+        from decimal import Decimal
         claim = ExtractedClaim(
             claim_id=gt.get("claim_id", ctx.case_id),
             payer=gt.get("payer", "Unknown"),
@@ -431,8 +430,8 @@ async def _run_eval(
 ) -> dict[str, Any]:
     """Run the full eval and aggregate metrics."""
     # Import agents lazily so the eval harness can be imported without side-effects
-    from agents.code_validator import CodeValidator  # noqa: PLC0415
-    from agents.regulation_deadline import RegulationDeadline  # noqa: PLC0415
+    from agents.code_validator import CodeValidator
+    from agents.regulation_deadline import RegulationDeadline
 
     validator = CodeValidator()
     deadline_agent = RegulationDeadline()
@@ -441,7 +440,7 @@ async def _run_eval(
     retriever: Any = None
     if not day3_only:
         try:
-            from agents.policy_retriever import PolicyRetriever  # noqa: PLC0415
+            from agents.policy_retriever import PolicyRetriever
             retriever = PolicyRetriever()
             logger.info("Policy retriever initialised (DB required).")
         except Exception as exc:
@@ -453,9 +452,9 @@ async def _run_eval(
     classifier: Any = None
     if not day3_only:
         try:
-            from agents.document_extractor import DocumentExtractor  # noqa: PLC0415
-            from agents.pii_redactor import PiiRedactor  # noqa: PLC0415
-            from agents.denial_classifier import DenialClassifier  # noqa: PLC0415
+            from agents.denial_classifier import DenialClassifier
+            from agents.document_extractor import DocumentExtractor
+            from agents.pii_redactor import PiiRedactor
             extractor = DocumentExtractor()
             redactor = PiiRedactor()
             classifier = DenialClassifier()

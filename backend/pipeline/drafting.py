@@ -23,7 +23,6 @@ Usage::
 from __future__ import annotations
 
 import dataclasses
-import json
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
@@ -66,8 +65,8 @@ _success_scorer = None
 def _get_agents() -> tuple[Any, Any, Any, Any]:
     global _evidence_builder, _appeal_writer, _groundedness_checker, _success_scorer
     if _evidence_builder is None:
-        from agents.evidence_builder import EvidenceBuilder
         from agents.appeal_writer import AppealWriter
+        from agents.evidence_builder import EvidenceBuilder
         from agents.groundedness_checker import GroundednessChecker
         from agents.success_scorer import SuccessScorer
         _evidence_builder = EvidenceBuilder()
