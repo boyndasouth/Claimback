@@ -133,7 +133,8 @@ export interface ReplayListResponse {
 }
 
 export interface EvalsMetrics {
-  [key: string]: number;
+  // null = not measured in this run (no cases for that metric)
+  [key: string]: number | null;
 }
 
 export interface EvalsResults {

@@ -95,6 +95,8 @@ jobs:
         run: python -m evals.run --subset 30 --day3-only
         env:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          # No database tables in this job: skip saving trace rows
+          TRACE_PERSIST: "0"
           PII_VAULT_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
           TOOLS_API_KEY: "test-key"
           ALLOWED_ORIGINS: "http://localhost:3000"

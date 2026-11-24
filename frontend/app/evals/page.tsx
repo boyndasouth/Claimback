@@ -24,7 +24,8 @@ function formatMetricName(key: string): string {
     .replace("Auc", "AUC");
 }
 
-function formatValue(key: string, value: number): string {
+function formatValue(key: string, value: number | null | undefined): string {
+  if (value === null || value === undefined) return "not measured";
   if (key === "pii_leakage_rate") return value.toFixed(3);
   if (key.includes("auc")) return value.toFixed(3);
   if (value <= 1 && value >= 0 && !key.includes("quality")) {

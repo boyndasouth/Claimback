@@ -523,27 +523,43 @@ async def _run_eval(
         if deadline_cases else 0.0
     )
 
+    # A metric with no cases behind it is "not measured" (None), not 0.0 or a
+    # vacuous pass: e.g. --day3-only skips the watsonx agents, so extraction,
+    # PII and category have no cases; retrieval needs a live pgvector DB.
+    counts = {
+        "extraction_f1": n2_ok,
+        "pii_leakage_rate": len(day2_results),
+        "category_accuracy": n2_ok,
+        "retrieval_recall_at_5": len(retrieval_cases),
+        "coding_error_recall": len(error_cases),
+        "deadline_exact_match": len(deadline_cases),
+    }
+    raw = {
+        "extraction_f1": extraction_f1,
+        "pii_leakage_rate": pii_leakage_rate,
+        "category_accuracy": category_accuracy,
+        "retrieval_recall_at_5": retrieval_recall_at_5,
+        "coding_error_recall": coding_error_recall,
+        "deadline_exact_match": deadline_exact_match,
+    }
+    metrics: dict[str, float | None] = {
+        k: (round(v, 4) if counts[k] else None) for k, v in raw.items()
+    }
+    passed: dict[str, bool] = {}
+    for k, v in raw.items():
+        if not counts[k]:
+            continue  # not measured → not gated
+        passed[k] = v <= _TARGETS[k] if k == "pii_leakage_rate" else v >= _TARGETS[k]
+
     summary = {
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z"),
         "n_cases": n,
         "n_ok": n3_ok,
-        "metrics": {
-            "extraction_f1": round(extraction_f1, 4),
-            "pii_leakage_rate": round(pii_leakage_rate, 4),
-            "category_accuracy": round(category_accuracy, 4),
-            "retrieval_recall_at_5": round(retrieval_recall_at_5, 4),
-            "coding_error_recall": round(coding_error_recall, 4),
-            "deadline_exact_match": round(deadline_exact_match, 4),
-        },
+        "metrics": metrics,
+        "case_counts": counts,
         "targets": _TARGETS,
-        "passed": {
-            "extraction_f1": extraction_f1 >= _TARGETS["extraction_f1"],
-            "pii_leakage_rate": pii_leakage_rate <= _TARGETS["pii_leakage_rate"],
-            "category_accuracy": category_accuracy >= _TARGETS["category_accuracy"],
-            "retrieval_recall_at_5": retrieval_recall_at_5 >= _TARGETS["retrieval_recall_at_5"],
-            "coding_error_recall": coding_error_recall >= _TARGETS["coding_error_recall"],
-            "deadline_exact_match": deadline_exact_match >= _TARGETS["deadline_exact_match"],
-        },
+        "passed": passed,
+        "not_measured": [k for k, c in counts.items() if not c],
         "leaked_cases": [r["case_id"] for r in leaked_cases],
         "case_results": day3_results,
     }
@@ -623,15 +639,21 @@ def main() -> int:
         target = _TARGETS.get(metric)
         if target is None:
             continue
-        passed_flag = summary["passed"].get(metric, False)
-        icon = "PASS" if passed_flag else "FAIL"
         op = "<=" if metric == "pii_leakage_rate" else ">="
-        print(f"  [{icon}]  {metric:<30} {value:.4f}  (target {op}{target})")
+        if value is None:
+            print(f"  [SKIP]  {metric:<30} not measured  (target {op}{target})")
+            continue
+        icon = "PASS" if summary["passed"][metric] else "FAIL"
+        n_m = summary["case_counts"][metric]
+        print(f"  [{icon}]  {metric:<30} {value:.4f}  (target {op}{target}, n={n_m})")
     print()
 
     if summary["leaked_cases"]:
         print(f"PII leaked in cases: {summary['leaked_cases']}")
 
+    if not summary["passed"]:
+        print("ERROR: no metric could be measured", file=sys.stderr)
+        return 1
     all_passed = all(summary["passed"].values())
     if all_passed:
         print("All metrics PASSED")

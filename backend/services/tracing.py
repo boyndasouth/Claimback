@@ -34,6 +34,10 @@ from db.models import AgentRun as AgentRun  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
+
+class _PersistDisabled(Exception):
+    """Internal signal: AgentRun persistence switched off via TRACE_PERSIST=0."""
+
 F = TypeVar("F", bound=Callable[..., Coroutine[Any, Any, Any]])
 
 # ── Cost estimate (rough; update when real pricing is available) ───────────────
@@ -141,8 +145,11 @@ def trace(prompt_version: str = "v1") -> Callable[[F], F]:
                 else:
                     output_payload = {}
 
-                # Persist to Postgres
+                # Persist to Postgres (TRACE_PERSIST=0 turns this off, e.g. for
+                # the no-credentials CI eval, which has no database tables)
                 try:
+                    if os.environ.get("TRACE_PERSIST", "1") == "0":
+                        raise _PersistDisabled
                     async with _AsyncSessionFactory() as session:
                         run = _AgentRun(
                             id=str(uuid.uuid4()),
@@ -158,6 +165,8 @@ def trace(prompt_version: str = "v1") -> Callable[[F], F]:
                         )
                         session.add(run)
                         await session.commit()
+                except _PersistDisabled:
+                    pass
                 except Exception as db_exc:
                     logger.warning("Failed to persist AgentRun: %s", db_exc)
 
