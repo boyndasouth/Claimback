@@ -70,7 +70,8 @@ def _extract_text_docling(source: str | bytes) -> str:
     else:
         result = converter.convert(source)
 
-    return result.document.export_to_markdown()
+    markdown: str = result.document.export_to_markdown()
+    return markdown
 
 
 def _is_file_path(value: str) -> bool:

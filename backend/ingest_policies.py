@@ -134,7 +134,8 @@ def _extract_text(path: pathlib.Path) -> str:
 
             converter = DocumentConverter()
             result = converter.convert(str(path))
-            return result.document.export_to_markdown()
+            markdown: str = result.document.export_to_markdown()
+            return markdown
         except Exception as exc:
             logger.warning("Docling failed for %s (%s) — falling back to raw read", path.name, exc)
     raw = path.read_text(encoding="utf-8", errors="replace")
