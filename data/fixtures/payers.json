@@ -1,0 +1,50 @@
+[
+  {
+    "payer": "BluePeak Health",
+    "plan_type": "employer",
+    "plan_name": "BluePeak Select PPO",
+    "coverage_description": "Preferred provider organization plan covering preventive, specialist, and hospital services with a $1,500 individual deductible."
+  },
+  {
+    "payer": "BluePeak Health",
+    "plan_type": "marketplace",
+    "plan_name": "BluePeak Silver Marketplace",
+    "coverage_description": "ACA marketplace silver-tier plan with cost-sharing reductions, $3,000 individual deductible, and essential health benefits."
+  },
+  {
+    "payer": "Meridian Insurance Group",
+    "plan_type": "employer",
+    "plan_name": "Meridian Advantage HMO",
+    "coverage_description": "Health maintenance organization plan requiring PCP referrals for specialist visits; $750 in-network individual deductible."
+  },
+  {
+    "payer": "Meridian Insurance Group",
+    "plan_type": "marketplace",
+    "plan_name": "Meridian Gold Exchange",
+    "coverage_description": "ACA marketplace gold-tier plan with broad network access, $1,000 individual deductible, and 20% coinsurance after deductible."
+  },
+  {
+    "payer": "Nexus Health Partners",
+    "plan_type": "employer",
+    "plan_name": "Nexus Flex HDHP",
+    "coverage_description": "High-deductible health plan compatible with an HSA; $2,800 individual deductible with preventive services covered at 100%."
+  },
+  {
+    "payer": "Nexus Health Partners",
+    "plan_type": "marketplace",
+    "plan_name": "Nexus Bronze Choice",
+    "coverage_description": "ACA marketplace bronze-tier plan with the lowest premiums; $6,500 individual deductible; emergency and preventive services covered."
+  },
+  {
+    "payer": "Summit Care Insurance",
+    "plan_type": "employer",
+    "plan_name": "Summit Total Care PPO",
+    "coverage_description": "Comprehensive employer PPO plan with $500 deductible, $20 PCP copay, and $50 specialist copay; mental health parity compliant."
+  },
+  {
+    "payer": "Summit Care Insurance",
+    "plan_type": "marketplace",
+    "plan_name": "Summit Platinum Select",
+    "coverage_description": "ACA marketplace platinum-tier plan with $0 deductible for in-network services, $15 PCP copay, and $30 specialist copay."
+  }
+]

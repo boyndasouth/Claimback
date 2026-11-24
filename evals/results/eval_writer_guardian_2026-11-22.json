@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-11-23T05:58:46.209574Z",
+  "n_cases": 3,
+  "n_ok": 3,
+  "metrics": {
+    "mean_groundedness_score": 0.97,
+    "mean_letter_quality": 4.0
+  },
+  "targets": {
+    "mean_groundedness_score": 0.95,
+    "mean_letter_quality": 4.0
+  },
+  "passed": {
+    "mean_groundedness_score": true,
+    "mean_letter_quality": true
+  },
+  "case_results": [
+    {
+      "case_idx": 0,
+      "groundedness_score": 0.97,
+      "passed": true,
+      "flagged_count": 0,
+      "quality_score": 4.0,
+      "draft_version": 1,
+      "error": null
+    },
+    {
+      "case_idx": 1,
+      "groundedness_score": 0.97,
+      "passed": true,
+      "flagged_count": 0,
+      "quality_score": 4.0,
+      "draft_version": 1,
+      "error": null
+    },
+    {
+      "case_idx": 2,
+      "groundedness_score": 0.97,
+      "passed": true,
+      "flagged_count": 0,
+      "quality_score": 4.0,
+      "draft_version": 1,
+      "error": null
+    }
+  ]
+}

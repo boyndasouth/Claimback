@@ -1,0 +1,75 @@
+{
+  "case": {
+    "case_id": "replay-sample-001",
+    "status": "AWAITING_APPROVAL",
+    "category": "medical_necessity",
+    "success_prob": 0.72,
+    "draft": "## Appeal Letter\n\nDear BlueSky Health Plan,\n\nI am writing to appeal the denial of my claim for CPT 70553 (MRI Brain without Contrast) dated March 1, 2024. [S1]\n\nThe denial cites Policy Section 4.2 regarding Diagnostic Imaging; however, the requested MRI meets clinical necessity criteria under the same section. [S2]\n\nMy treating physician documented progressive headaches and neurological symptoms consistent with the coverage criteria. [S3]\n\nI respectfully request that you reconsider this denial.\n\nSincerely,\nJane Smith",
+    "draft_version": 1,
+    "grounding_passed": true
+  },
+  "trace": {
+    "case_id": "replay-sample-001",
+    "agents": [
+      {"agent": "DocumentExtractor", "input_hash": "a1b2c3d4e5f6g7h8", "tokens_in": 420, "tokens_out": 185, "latency_ms": 1240, "cost_usd": 0.000098, "trace_id": "tr-001-ext"},
+      {"agent": "PiiRedactor", "input_hash": "b2c3d4e5f6g7h8i9", "tokens_in": 185, "tokens_out": 190, "latency_ms": 820, "cost_usd": 0.000076, "trace_id": "tr-001-pii"},
+      {"agent": "DenialClassifier", "input_hash": "c3d4e5f6g7h8i9j0", "tokens_in": 190, "tokens_out": 42, "latency_ms": 650, "cost_usd": 0.000032, "trace_id": "tr-001-cls"},
+      {"agent": "PolicyRetriever", "input_hash": "d4e5f6g7h8i9j0k1", "tokens_in": 230, "tokens_out": 310, "latency_ms": 1870, "cost_usd": 0.000116, "trace_id": "tr-001-pol"},
+      {"agent": "CodeValidator", "input_hash": "e5f6g7h8i9j0k1l2", "tokens_in": 0, "tokens_out": 0, "latency_ms": 45, "cost_usd": null, "trace_id": "tr-001-cov"},
+      {"agent": "RegulationDeadline", "input_hash": "f6g7h8i9j0k1l2m3", "tokens_in": 85, "tokens_out": 95, "latency_ms": 730, "cost_usd": 0.000037, "trace_id": "tr-001-reg"},
+      {"agent": "EvidenceBuilder", "input_hash": "g7h8i9j0k1l2m3n4", "tokens_in": 540, "tokens_out": 220, "latency_ms": 1430, "cost_usd": 0.000120, "trace_id": "tr-001-evd"},
+      {"agent": "AppealWriter", "input_hash": "h8i9j0k1l2m3n4o5", "tokens_in": 820, "tokens_out": 410, "latency_ms": 3250, "cost_usd": 0.000205, "trace_id": "tr-001-wrt"},
+      {"agent": "GroundednessChecker", "input_hash": "i9j0k1l2m3n4o5p6", "tokens_in": 410, "tokens_out": 95, "latency_ms": 1120, "cost_usd": 0.000070, "trace_id": "tr-001-grd"},
+      {"agent": "SuccessScorer", "input_hash": "j0k1l2m3n4o5p6q7", "tokens_in": 180, "tokens_out": 90, "latency_ms": 680, "cost_usd": 0.000045, "trace_id": "tr-001-sco"},
+      {"agent": "FollowupTracker", "input_hash": "k1l2m3n4o5p6q7r8", "tokens_in": 65, "tokens_out": 40, "latency_ms": 310, "cost_usd": 0.000019, "trace_id": "tr-001-fup"}
+    ]
+  },
+  "summary": {
+    "explanation": "Your MRI claim was denied under Policy Section 4.2 (Diagnostic Imaging) because the insurer determined the procedure did not meet their Medical Necessity criteria. This is one of the most commonly appealed denial categories and has a relatively high overturn rate when supported by physician documentation.",
+    "appeal_plan": {
+      "internal_appeal_deadline": "2024-04-15",
+      "external_review_available": true,
+      "external_review_deadline": "2024-05-15",
+      "expedited_eligible": false,
+      "rule_sources": [
+        {"clause_id": "ca-rule-180", "doc_id": "state-rules-CA", "section": "§1368", "text": "Enrollee must file internal appeal within 180 days of denial notice."}
+      ]
+    },
+    "evidence_checklist": {
+      "items": [
+        {"item_id": "ev-001", "description": "Physician's letter of medical necessity for MRI 70553", "rationale": "Directly rebutts the medical necessity denial basis", "priority": "high"},
+        {"item_id": "ev-002", "description": "Clinical notes documenting neurological symptoms", "rationale": "Establishes documented need prior to imaging request", "priority": "high"},
+        {"item_id": "ev-003", "description": "Copy of insurer's coverage criteria for Diagnostic Imaging", "rationale": "Cite specific subsection the claim satisfies", "priority": "medium"}
+      ]
+    },
+    "code_issues": [],
+    "success_estimate": {
+      "probability": 0.72,
+      "top_factors": [["physician_letter_documented", 0.31], ["category_medical_necessity", 0.24], ["plan_type_employer", 0.17]],
+      "explanation": "Medical necessity appeals with documented physician support have a strong track record. The absence of coding errors and a clear employer plan type further improve the outlook."
+    }
+  },
+  "draft": {
+    "case_id": "replay-sample-001",
+    "version": 1,
+    "body_markdown": "## Appeal Letter\n\nDear BlueSky Health Plan,\n\nI am writing to appeal the denial of my claim for CPT 70553 (MRI Brain without Contrast) dated March 1, 2024. [S1]\n\nThe denial cites Policy Section 4.2 regarding Diagnostic Imaging; however, the requested MRI meets clinical necessity criteria under the same section. [S2]\n\nMy treating physician documented progressive headaches and neurological symptoms consistent with the coverage criteria. [S3]\n\nI respectfully request that you reconsider this denial.\n\nSincerely,\nJane Smith",
+    "citations": {
+      "S1": {"clause_id": "policy-4.2.1", "doc_id": "bluesky-employer-plan", "section": "Section 4.2 — Diagnostic Imaging", "text": "MRI procedures are covered when deemed medically necessary by a licensed physician."},
+      "S2": {"clause_id": "policy-4.2.3", "doc_id": "bluesky-employer-plan", "section": "Section 4.2.3 — Medical Necessity Criteria", "text": "Medical necessity is established when the procedure is consistent with the diagnosis and would not be performed absent the clinical indication."},
+      "S3": {"clause_id": "policy-4.2.2", "doc_id": "bluesky-employer-plan", "section": "Section 4.2.2 — Physician Documentation", "text": "Claims for diagnostic imaging must be supported by contemporaneous physician notes documenting the clinical indication."}
+    },
+    "grounding_report": {
+      "passed": true,
+      "flagged_spans": [],
+      "groundedness_score": 0.97
+    }
+  },
+  "events": [
+    {"elapsed_ms": 0, "type": "status", "status": "EXTRACTING"},
+    {"elapsed_ms": 12000, "type": "status", "status": "ANALYZING"},
+    {"elapsed_ms": 24000, "type": "status", "status": "DRAFTING"},
+    {"elapsed_ms": 36000, "type": "status", "status": "VERIFYING"},
+    {"elapsed_ms": 48000, "type": "status", "status": "AWAITING_APPROVAL"},
+    {"elapsed_ms": 48000, "type": "done", "status": "AWAITING_APPROVAL", "success_prob": 0.72}
+  ]
+}

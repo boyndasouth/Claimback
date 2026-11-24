@@ -1,0 +1,365 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ClaimBack Tools API",
+    "description": "Orchestrate-facing tool endpoints for ClaimBack (§7.2). All operations require an X-API-Key header matching the TOOLS_API_KEY environment variable on the backend.",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Deployed backend — set TOOLS_BASE_URL to the Render URL (e.g. https://claimback-api.onrender.com)"
+    }
+  ],
+  "paths": {
+    "/tools/case_create": {
+      "post": {
+        "summary": "Create a new case from chat",
+        "description": "Create a case record and return its ID. Called by the intake collaborator agent when a user starts a new appeal.",
+        "operationId": "case_create",
+        "security": [{ "ApiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CaseCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseCreateResponse" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_status": {
+      "get": {
+        "summary": "Return case status and summary",
+        "description": "Return the current status of a case plus a one-line summary. The supervisor calls this before answering any case-specific question.",
+        "operationId": "case_status",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "case_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "UUID of the case"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Case status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaseStatusResponse" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" },
+          "404": { "description": "Case not found" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_run_pipeline": {
+      "post": {
+        "summary": "Kick off the analysis pipeline for a case",
+        "description": "Trigger agents 3→4→5 (extract, redact, classify) followed by the analysis stage (agents 6/7/8) as a background task. Returns immediately with status 'pipeline_started'.",
+        "operationId": "case_run_pipeline",
+        "security": [{ "ApiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RunPipelineRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pipeline started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "case_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" },
+          "404": { "description": "Case not found" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_get_explanation": {
+      "get": {
+        "summary": "Return a plain-language denial explanation",
+        "description": "Return the denial category and a plain-language explanation for a case. Available once the pipeline has reached at least ANALYZING status.",
+        "operationId": "case_get_explanation",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "case_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "UUID of the case"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Denial explanation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetExplanationResponse" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" },
+          "404": { "description": "Case not found" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_get_draft": {
+      "get": {
+        "summary": "Return current appeal draft and grounding report",
+        "description": "Return the latest appeal draft body and whether it passed groundedness checking. Available once AWAITING_APPROVAL status is reached (Day 5).",
+        "operationId": "case_get_draft",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "case_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "UUID of the case"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appeal draft",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetDraftResponse" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_approve": {
+      "post": {
+        "summary": "Approve the appeal draft",
+        "description": "Record human approval of the appeal draft and transition case to READY_TO_SEND. Called from the approval_and_followup Orchestrate flow.",
+        "operationId": "case_approve",
+        "security": [{ "ApiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApproveRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Approval recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "case_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" }
+        },
+        "tags": ["tools"]
+      }
+    },
+    "/tools/case_schedule_followup": {
+      "post": {
+        "summary": "Create a follow-up reminder for a case",
+        "description": "Schedule a reminder for the case (e.g. internal appeal deadline). Called by the follow-up collaborator agent and the approval flow.",
+        "operationId": "case_schedule_followup",
+        "security": [{ "ApiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ScheduleFollowupRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reminder created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "case_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-API-Key" }
+        },
+        "tags": ["tools"]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Shared secret — set TOOLS_API_KEY on the backend and configure the same value as an Orchestrate connection credential."
+      }
+    },
+    "schemas": {
+      "CaseCreateRequest": {
+        "type": "object",
+        "required": ["user_id"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "Identifier of the user creating the case (e.g. chat session ID)"
+          },
+          "notes": {
+            "type": "string",
+            "default": "",
+            "description": "Optional free-text notes from the user about the denial"
+          }
+        }
+      },
+      "CaseCreateResponse": {
+        "type": "object",
+        "required": ["case_id", "status"],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "description": "UUID of the newly created case"
+          },
+          "status": {
+            "type": "string",
+            "description": "Always 'created' on success"
+          }
+        }
+      },
+      "CaseStatusResponse": {
+        "type": "object",
+        "required": ["case_id", "status"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "status": {
+            "type": "string",
+            "description": "Current CaseStatus value (created|extracting|analyzing|drafting|verifying|needs_human_review|awaiting_approval|ready_to_send|follow_up|external_review|closed)"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true,
+            "description": "One-line summary of the case state; null if not yet available"
+          }
+        }
+      },
+      "RunPipelineRequest": {
+        "type": "object",
+        "required": ["case_id"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "denial_text": {
+            "type": "string",
+            "description": "Raw denial letter text to process. If omitted, the pipeline uses documents already attached to the case."
+          }
+        }
+      },
+      "GetExplanationResponse": {
+        "type": "object",
+        "required": ["case_id", "explanation"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "explanation": {
+            "type": "string",
+            "description": "Plain-language explanation of the denial category and reason"
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "description": "Denial category (medical_necessity|prior_authorization|coding_error|out_of_network|not_covered_benefit|administrative)"
+          }
+        }
+      },
+      "GetDraftResponse": {
+        "type": "object",
+        "required": ["case_id"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "draft": {
+            "type": "string",
+            "nullable": true,
+            "description": "Markdown body of the latest appeal draft"
+          },
+          "grounding_passed": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether the draft passed Granite Guardian groundedness checking"
+          }
+        }
+      },
+      "ApproveRequest": {
+        "type": "object",
+        "required": ["case_id", "approved_by"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "approved_by": {
+            "type": "string",
+            "description": "Identifier of the approver (user ID or 'orchestrate_flow')"
+          }
+        }
+      },
+      "ScheduleFollowupRequest": {
+        "type": "object",
+        "required": ["case_id", "due_at"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 datetime for the reminder"
+          },
+          "kind": {
+            "type": "string",
+            "default": "internal_appeal",
+            "description": "Reminder type: internal_appeal | external_review | escalation"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "case": {
+    "case_id": "replay-sample-003",
+    "status": "AWAITING_APPROVAL",
+    "category": "coding_error",
+    "success_prob": 0.84,
+    "draft": "## Appeal Letter\n\nDear Summit Insurance Group,\n\nI am writing to appeal the denial of claim #CLM-2024-01245 for services rendered on February 20, 2024. [S1]\n\nThe denial cites a code pairing issue between CPT 99214 (Office Visit, Level 4) and CPT 93000 (Electrocardiogram). These codes are routinely billed together when an ECG is performed during an evaluation and management visit. [S2]\n\nThe NCCI edit that may have triggered this denial has an applicable modifier exception. Modifier -59 applies here as the ECG was a distinct and separate service from the E&M visit. [S3]\n\nWe request reconsideration and reprocessing of this claim.\n\nSincerely,\nMaria Gonzalez",
+    "draft_version": 1,
+    "grounding_passed": true
+  },
+  "trace": {
+    "case_id": "replay-sample-003",
+    "agents": [
+      {"agent": "DocumentExtractor", "input_hash": "w3x4y5z6a1b2c3d4", "tokens_in": 390, "tokens_out": 170, "latency_ms": 1180, "cost_usd": 0.000089, "trace_id": "tr-003-ext"},
+      {"agent": "PiiRedactor", "input_hash": "x4y5z6a1b2c3d4e5", "tokens_in": 170, "tokens_out": 174, "latency_ms": 760, "cost_usd": 0.000070, "trace_id": "tr-003-pii"},
+      {"agent": "DenialClassifier", "input_hash": "y5z6a1b2c3d4e5f6", "tokens_in": 174, "tokens_out": 38, "latency_ms": 590, "cost_usd": 0.000029, "trace_id": "tr-003-cls"},
+      {"agent": "PolicyRetriever", "input_hash": "z6a1b2c3d4e5f6g7", "tokens_in": 210, "tokens_out": 280, "latency_ms": 1740, "cost_usd": 0.000105, "trace_id": "tr-003-pol"},
+      {"agent": "CodeValidator", "input_hash": "a1b2c3d4e5f6g7h8", "tokens_in": 0, "tokens_out": 0, "latency_ms": 52, "cost_usd": null, "trace_id": "tr-003-cov"},
+      {"agent": "RegulationDeadline", "input_hash": "b2c3d4e5f6g7h8i9", "tokens_in": 78, "tokens_out": 88, "latency_ms": 650, "cost_usd": 0.000034, "trace_id": "tr-003-reg"},
+      {"agent": "EvidenceBuilder", "input_hash": "c3d4e5f6g7h8i9j0", "tokens_in": 490, "tokens_out": 200, "latency_ms": 1320, "cost_usd": 0.000109, "trace_id": "tr-003-evd"},
+      {"agent": "AppealWriter", "input_hash": "d4e5f6g7h8i9j0k1", "tokens_in": 740, "tokens_out": 390, "latency_ms": 3010, "cost_usd": 0.000191, "trace_id": "tr-003-wrt"},
+      {"agent": "GroundednessChecker", "input_hash": "e5f6g7h8i9j0k1l2", "tokens_in": 390, "tokens_out": 88, "latency_ms": 1050, "cost_usd": 0.000065, "trace_id": "tr-003-grd"},
+      {"agent": "SuccessScorer", "input_hash": "f6g7h8i9j0k1l2m3", "tokens_in": 165, "tokens_out": 82, "latency_ms": 640, "cost_usd": 0.000041, "trace_id": "tr-003-sco"},
+      {"agent": "FollowupTracker", "input_hash": "g7h8i9j0k1l2m3n4", "tokens_in": 60, "tokens_out": 38, "latency_ms": 275, "cost_usd": 0.000017, "trace_id": "tr-003-fup"}
+    ]
+  },
+  "summary": {
+    "explanation": "Your claim was denied due to a code pairing issue — the insurer's system flagged CPT 99214 and CPT 93000 as unbundled codes. This is a coding error denial, not a question of medical coverage. These codes are legitimately billable together when the ECG is a separate, distinct service. Modifier -59 resolves the NCCI edit.",
+    "appeal_plan": {
+      "internal_appeal_deadline": "2024-04-20",
+      "external_review_available": false,
+      "external_review_deadline": null,
+      "expedited_eligible": false,
+      "rule_sources": [
+        {"clause_id": "tx-rule-180", "doc_id": "state-rules-TX", "section": "§1301.067", "text": "Enrollee must file internal appeal within 180 days of denial notice."}
+      ]
+    },
+    "evidence_checklist": {
+      "items": [
+        {"item_id": "ev-001", "description": "Resubmit claim with Modifier -59 appended to CPT 93000", "rationale": "Directly resolves the NCCI bundling edit", "priority": "high"},
+        {"item_id": "ev-002", "description": "Medical record documenting ECG was performed separately from E&M", "rationale": "Establishes the distinct service requirement for Modifier -59", "priority": "high"},
+        {"item_id": "ev-003", "description": "CMS NCCI policy article supporting 99214/93000 combination", "rationale": "Provides regulatory basis for the modifier exception", "priority": "medium"}
+      ]
+    },
+    "code_issues": [
+      {
+        "issue_type": "unbundling",
+        "severity": "medium",
+        "cpt_code": "93000",
+        "icd10_code": null,
+        "message": "CPT 93000 may be bundled with 99214 under NCCI edits. Apply Modifier -59 to indicate a distinct service.",
+        "source": {"clause_id": "ncci-edit-99214-93000", "doc_id": "cpt-rules", "section": "NCCI Edit Table 2024", "text": "99214 and 93000 are bundled unless a modifier exception applies."}
+      }
+    ],
+    "success_estimate": {
+      "probability": 0.84,
+      "top_factors": [["coding_error_clear_fix", 0.38], ["modifier_applicable", 0.29], ["category_coding_error", 0.17]],
+      "explanation": "Coding error denials with a clear modifier fix have the highest overturn rate of any denial category. This case has a straightforward resolution."
+    }
+  },
+  "draft": {
+    "case_id": "replay-sample-003",
+    "version": 1,
+    "body_markdown": "## Appeal Letter\n\nDear Summit Insurance Group,\n\nI am writing to appeal the denial of claim #CLM-2024-01245 for services rendered on February 20, 2024. [S1]\n\nThe denial cites a code pairing issue between CPT 99214 (Office Visit, Level 4) and CPT 93000 (Electrocardiogram). These codes are routinely billed together when an ECG is performed during an evaluation and management visit. [S2]\n\nThe NCCI edit that may have triggered this denial has an applicable modifier exception. Modifier -59 applies here as the ECG was a distinct and separate service from the E&M visit. [S3]\n\nWe request reconsideration and reprocessing of this claim.\n\nSincerely,\nMaria Gonzalez",
+    "citations": {
+      "S1": {"clause_id": "policy-9.1.1", "doc_id": "summit-employer-plan", "section": "Section 9.1 — Claim Submission", "text": "Claims must be submitted using CMS-1500 with valid CPT codes as published in the current AMA CPT codebook."},
+      "S2": {"clause_id": "ncci-guidance-2024", "doc_id": "cpt-rules", "section": "CMS NCCI Policy Manual Ch. 1", "text": "When an ECG is performed as a component of a separately identifiable E&M service, both codes may be billed with appropriate modifier."},
+      "S3": {"clause_id": "ncci-mod59", "doc_id": "cpt-rules", "section": "Modifier -59 — Distinct Procedural Service", "text": "Modifier -59 is used to identify procedures or services not normally reported together but appropriately billed under the circumstances described."}
+    },
+    "grounding_report": {
+      "passed": true,
+      "flagged_spans": [],
+      "groundedness_score": 0.97
+    }
+  },
+  "events": [
+    {"elapsed_ms": 0, "type": "status", "status": "EXTRACTING"},
+    {"elapsed_ms": 12000, "type": "status", "status": "ANALYZING"},
+    {"elapsed_ms": 24000, "type": "status", "status": "DRAFTING"},
+    {"elapsed_ms": 36000, "type": "status", "status": "VERIFYING"},
+    {"elapsed_ms": 48000, "type": "status", "status": "AWAITING_APPROVAL"},
+    {"elapsed_ms": 48000, "type": "done", "status": "AWAITING_APPROVAL", "success_prob": 0.84}
+  ]
+}

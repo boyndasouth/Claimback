@@ -1,0 +1,60 @@
+# Render Blueprint — ClaimBack backend + Postgres (pgvector).
+# Deploy: Render dashboard → New → Blueprint → pick this repo.
+#
+# Notes
+# - No rootDir: the backend reads prompts/, data/fixtures/, replay/ and
+#   evals/results/ from the repo root, so the whole repo must be present.
+# - Migrations run on every start (free plan has no pre-deploy command);
+#   `alembic upgrade head` is a no-op when already up to date.
+# - Free web services sleep after ~15 min idle (first request ~1 min).
+# - Free Postgres expires 30 days after creation — fine for the trial demo;
+#   replay mode keeps the UI working afterwards.
+# - Region ohio: closest Render region to watsonx.ai us-south (Dallas), which
+#   the pipeline calls many times per case.
+
+services:
+  - type: web
+    name: claimback-backend
+    runtime: python
+    plan: free
+    region: ohio
+    buildCommand: cd backend && pip install --upgrade pip && pip install -e .
+    startCommand: cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.4
+      - key: DATABASE_URL
+        fromDatabase:
+          name: claimback-db
+          property: connectionString
+      # Secrets — Render asks for these when the Blueprint is created
+      - key: WATSONX_API_KEY
+        sync: false
+      - key: WATSONX_PROJECT_ID
+        sync: false
+      - key: WATSONX_URL
+        value: https://us-south.ml.cloud.ibm.com
+      - key: TOOLS_API_KEY
+        sync: false
+      - key: PII_VAULT_KEY
+        sync: false
+      # Your Vercel URL(s), comma-separated, e.g. https://claimback.vercel.app
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Optional: embedded-chat JWT signing (Orchestrate Embed Security on).
+      # Paste the private key PEM; "\n" escapes are accepted.
+      - key: WXO_EMBED_PRIVATE_KEY
+        sync: false
+      # Optional tracing
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+
+databases:
+  - name: claimback-db
+    plan: free
+    region: ohio
+    databaseName: claimback
+    user: claimback

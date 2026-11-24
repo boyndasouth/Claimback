@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-11-22T21:48:46.349807Z",
+  "n_cases": 3,
+  "n_ok": 0,
+  "metrics": {
+    "extraction_f1": 0.0,
+    "pii_leakage_rate": 0.0,
+    "category_accuracy": 0.0
+  },
+  "targets": {
+    "extraction_f1": 0.9,
+    "pii_leakage_rate": 0.0,
+    "category_accuracy": 0.85
+  },
+  "passed": {
+    "extraction_f1": false,
+    "pii_leakage_rate": true,
+    "category_accuracy": false
+  },
+  "leaked_cases": [],
+  "case_results": [
+    {
+      "case_id": "SMOKE-0000",
+      "extraction_f1": 0.0,
+      "pii_leaked": [],
+      "category_correct": false,
+      "predicted_category": null,
+      "error": "WATSONX_API_KEY and WATSONX_PROJECT_ID must be set before initialising WatsonxClient"
+    },
+    {
+      "case_id": "SMOKE-0001",
+      "extraction_f1": 0.0,
+      "pii_leaked": [],
+      "category_correct": false,
+      "predicted_category": null,
+      "error": "WATSONX_API_KEY and WATSONX_PROJECT_ID must be set before initialising WatsonxClient"
+    },
+    {
+      "case_id": "SMOKE-0002",
+      "extraction_f1": 0.0,
+      "pii_leaked": [],
+      "category_correct": false,
+      "predicted_category": null,
+      "error": "WATSONX_API_KEY and WATSONX_PROJECT_ID must be set before initialising WatsonxClient"
+    }
+  ]
+}

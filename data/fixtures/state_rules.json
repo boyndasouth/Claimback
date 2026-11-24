@@ -1,0 +1,82 @@
+[
+  {
+    "state": "CA",
+    "state_name": "California",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 45,
+    "expedited_days": 3
+  },
+  {
+    "state": "TX",
+    "state_name": "Texas",
+    "internal_days": 120,
+    "external_review_available": true,
+    "external_days": 45,
+    "expedited_days": 3
+  },
+  {
+    "state": "NY",
+    "state_name": "New York",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 45,
+    "expedited_days": 2
+  },
+  {
+    "state": "FL",
+    "state_name": "Florida",
+    "internal_days": 365,
+    "external_review_available": true,
+    "external_days": 60,
+    "expedited_days": 3
+  },
+  {
+    "state": "IL",
+    "state_name": "Illinois",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 45,
+    "expedited_days": 3
+  },
+  {
+    "state": "PA",
+    "state_name": "Pennsylvania",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 60,
+    "expedited_days": 3
+  },
+  {
+    "state": "OH",
+    "state_name": "Ohio",
+    "internal_days": 180,
+    "external_review_available": false,
+    "external_days": null,
+    "expedited_days": 3
+  },
+  {
+    "state": "GA",
+    "state_name": "Georgia",
+    "internal_days": 120,
+    "external_review_available": true,
+    "external_days": 30,
+    "expedited_days": 3
+  },
+  {
+    "state": "NC",
+    "state_name": "North Carolina",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 45,
+    "expedited_days": 3
+  },
+  {
+    "state": "WA",
+    "state_name": "Washington",
+    "internal_days": 180,
+    "external_review_available": true,
+    "external_days": 20,
+    "expedited_days": 2
+  }
+]

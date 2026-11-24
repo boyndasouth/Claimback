@@ -1,0 +1,8 @@
+{
+  "state": "GA",
+  "state_name": "Georgia",
+  "internal_days": 120,
+  "external_review_available": true,
+  "external_days": 30,
+  "expedited_days": 3
+}

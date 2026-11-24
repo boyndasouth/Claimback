@@ -1,0 +1,15 @@
+# backend/config/models.yaml
+# Model tier configuration (§5.1). To swap a model, change the value here;
+# never hard-code IDs in agent code.
+#
+# Checked 2026-11-23 against the models this watsonx.ai project actually offers
+# (us-south). granite-3-8b-instruct and granite-guardian-3-8b are NOT available
+# here, so:
+#   - routing/writing use Granite 4 (granite-4-h-small, instruct-tuned)
+#   - the groundedness check runs as an LLM judge on a *different* model family
+#     than the writer, so the writer isn't grading its own output.
+
+routing:   ibm/granite-4-h-small              # classifier, redaction, supervisor helpers
+writing:   ibm/granite-4-h-small              # extractor, evidence builder, appeal writer
+guardian:  meta-llama/llama-3-3-70b-instruct  # groundedness judge (Granite Guardian not offered in this project)
+embedding: ibm/granite-embedding-278m-multilingual

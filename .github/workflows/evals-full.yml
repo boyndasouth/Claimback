@@ -1,0 +1,80 @@
+name: Full eval suite (all metrics)
+
+on:
+  workflow_dispatch:
+    inputs:
+      subset:
+        description: "Number of cases to run (default: 30 for speed, omit for all)"
+        required: false
+        default: "30"
+  schedule:
+    # 03:00 UTC nightly
+    - cron: "0 3 * * *"
+
+jobs:
+  evals-full:
+    name: Full eval suite with watsonx
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend with dev extras
+        run: pip install -e "backend[dev]"
+
+      - name: Check whether watsonx credentials are available
+        id: creds
+        run: |
+          if [ -z "$WATSONX_API_KEY" ]; then
+            echo "has_creds=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::WATSONX_API_KEY secret is not set — skipping full eval suite."
+          else
+            echo "has_creds=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+
+      - name: Ensure evals package is importable
+        run: |
+          if [ ! -f evals/__init__.py ]; then
+            touch evals/__init__.py
+          fi
+
+      - name: Run all metrics eval (Day 2+3 agents)
+        if: steps.creds.outputs.has_creds == 'true'
+        run: |
+          SUBSET="${{ github.event.inputs.subset || '30' }}"
+          python -m evals.run --subset "$SUBSET"
+        env:
+          WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+          WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+          WATSONX_URL: ${{ secrets.WATSONX_URL }}
+          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          PII_VAULT_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+          TOOLS_API_KEY: "test-key"
+          ALLOWED_ORIGINS: "http://localhost:3000"
+
+      - name: Run writer/guardian eval (Day 5 agents)
+        if: steps.creds.outputs.has_creds == 'true'
+        run: python evals/eval_writer_guardian.py --subset 5
+        env:
+          WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+          WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+          WATSONX_URL: ${{ secrets.WATSONX_URL }}
+          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          PII_VAULT_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+          TOOLS_API_KEY: "test-key"
+          ALLOWED_ORIGINS: "http://localhost:3000"
+
+      - name: Upload eval results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-full-${{ github.run_id }}
+          path: evals/results/
+          retention-days: 90

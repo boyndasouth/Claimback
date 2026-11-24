@@ -1,0 +1,76 @@
+{
+  "case": {
+    "case_id": "replay-sample-002",
+    "status": "AWAITING_APPROVAL",
+    "category": "prior_authorization",
+    "success_prob": 0.61,
+    "draft": "## Appeal Letter\n\nDear Meridian Health Insurance,\n\nI am writing to appeal the denial of claim #CLM-2024-00891 for CPT 27447 (Total Knee Arthroplasty) denied on April 10, 2024. [S1]\n\nThe denial states prior authorization was not obtained; however, our records show authorization request #PA-2024-1823 was submitted on March 28, 2024. [S2]\n\nUnder California Insurance Code §10169.3, the insurer must respond to urgent prior authorization requests within 72 hours. [S3]\n\nWe respectfully request immediate reconsideration.\n\nSincerely,\nRobert Chen",
+    "draft_version": 1,
+    "grounding_passed": true
+  },
+  "trace": {
+    "case_id": "replay-sample-002",
+    "agents": [
+      {"agent": "DocumentExtractor", "input_hash": "l2m3n4o5p6q7r8s9", "tokens_in": 510, "tokens_out": 220, "latency_ms": 1540, "cost_usd": 0.000117, "trace_id": "tr-002-ext"},
+      {"agent": "PiiRedactor", "input_hash": "m3n4o5p6q7r8s9t0", "tokens_in": 220, "tokens_out": 225, "latency_ms": 790, "cost_usd": 0.000090, "trace_id": "tr-002-pii"},
+      {"agent": "DenialClassifier", "input_hash": "n4o5p6q7r8s9t0u1", "tokens_in": 225, "tokens_out": 48, "latency_ms": 710, "cost_usd": 0.000037, "trace_id": "tr-002-cls"},
+      {"agent": "PolicyRetriever", "input_hash": "o5p6q7r8s9t0u1v2", "tokens_in": 265, "tokens_out": 290, "latency_ms": 1920, "cost_usd": 0.000114, "trace_id": "tr-002-pol"},
+      {"agent": "CodeValidator", "input_hash": "p6q7r8s9t0u1v2w3", "tokens_in": 0, "tokens_out": 0, "latency_ms": 38, "cost_usd": null, "trace_id": "tr-002-cov"},
+      {"agent": "RegulationDeadline", "input_hash": "q7r8s9t0u1v2w3x4", "tokens_in": 92, "tokens_out": 100, "latency_ms": 810, "cost_usd": 0.000039, "trace_id": "tr-002-reg"},
+      {"agent": "EvidenceBuilder", "input_hash": "r8s9t0u1v2w3x4y5", "tokens_in": 580, "tokens_out": 240, "latency_ms": 1610, "cost_usd": 0.000130, "trace_id": "tr-002-evd"},
+      {"agent": "AppealWriter", "input_hash": "s9t0u1v2w3x4y5z6", "tokens_in": 870, "tokens_out": 440, "latency_ms": 3480, "cost_usd": 0.000219, "trace_id": "tr-002-wrt"},
+      {"agent": "GroundednessChecker", "input_hash": "t0u1v2w3x4y5z6a1", "tokens_in": 440, "tokens_out": 100, "latency_ms": 1250, "cost_usd": 0.000074, "trace_id": "tr-002-grd"},
+      {"agent": "SuccessScorer", "input_hash": "u1v2w3x4y5z6a1b2", "tokens_in": 195, "tokens_out": 95, "latency_ms": 720, "cost_usd": 0.000048, "trace_id": "tr-002-sco"},
+      {"agent": "FollowupTracker", "input_hash": "v2w3x4y5z6a1b2c3", "tokens_in": 68, "tokens_out": 42, "latency_ms": 290, "cost_usd": 0.000020, "trace_id": "tr-002-fup"}
+    ]
+  },
+  "summary": {
+    "explanation": "Your knee replacement claim was denied because the insurer claims no prior authorization was on file. This is an administrative denial — the procedure itself is covered. Prior authorization disputes are often resolved quickly when you can demonstrate the authorization was requested or that the insurer failed to respond within the required timeframe.",
+    "appeal_plan": {
+      "internal_appeal_deadline": "2024-05-10",
+      "external_review_available": true,
+      "external_review_deadline": "2024-06-10",
+      "expedited_eligible": true,
+      "rule_sources": [
+        {"clause_id": "ca-rule-ins-10169", "doc_id": "state-rules-CA", "section": "§10169.3", "text": "Insurer must respond to prior authorization requests within 5 business days (or 72 hours for urgent cases)."}
+      ]
+    },
+    "evidence_checklist": {
+      "items": [
+        {"item_id": "ev-001", "description": "Copy of prior authorization request #PA-2024-1823 with submission timestamp", "rationale": "Directly refutes the claim that no authorization was obtained", "priority": "high"},
+        {"item_id": "ev-002", "description": "Any acknowledgement or reference number from the insurer for PA-2024-1823", "rationale": "Establishes the insurer received the request", "priority": "high"},
+        {"item_id": "ev-003", "description": "Physician's letter of urgency if applicable", "rationale": "May qualify for expedited review and 72-hour response requirement", "priority": "medium"},
+        {"item_id": "ev-004", "description": "Pre-operative notes and conservative-treatment history", "rationale": "Demonstrates medical necessity even if authorization is disputed", "priority": "low"}
+      ]
+    },
+    "code_issues": [],
+    "success_estimate": {
+      "probability": 0.61,
+      "top_factors": [["prior_auth_documentation", 0.28], ["category_prior_authorization", 0.21], ["expedited_eligible", 0.12]],
+      "explanation": "Prior authorization disputes are frequently resolved in the patient's favor when proof of submission exists. The expedited eligibility further strengthens the case."
+    }
+  },
+  "draft": {
+    "case_id": "replay-sample-002",
+    "version": 1,
+    "body_markdown": "## Appeal Letter\n\nDear Meridian Health Insurance,\n\nI am writing to appeal the denial of claim #CLM-2024-00891 for CPT 27447 (Total Knee Arthroplasty) denied on April 10, 2024. [S1]\n\nThe denial states prior authorization was not obtained; however, our records show authorization request #PA-2024-1823 was submitted on March 28, 2024. [S2]\n\nUnder California Insurance Code §10169.3, the insurer must respond to urgent prior authorization requests within 72 hours. [S3]\n\nWe respectfully request immediate reconsideration.\n\nSincerely,\nRobert Chen",
+    "citations": {
+      "S1": {"clause_id": "policy-7.1.2", "doc_id": "meridian-employer-plan", "section": "Section 7.1 — Prior Authorization Requirements", "text": "Services requiring prior authorization are listed in Schedule A. Total Knee Arthroplasty (CPT 27447) requires prior authorization."},
+      "S2": {"clause_id": "policy-7.3.1", "doc_id": "meridian-employer-plan", "section": "Section 7.3 — Authorization Request Submission", "text": "Authorization requests must be submitted via the provider portal or fax no less than 5 business days before the scheduled procedure."},
+      "S3": {"clause_id": "ca-rule-ins-10169", "doc_id": "state-rules-CA", "section": "§10169.3", "text": "Insurer must respond to prior authorization requests within 5 business days (or 72 hours for urgent cases)."}
+    },
+    "grounding_report": {
+      "passed": true,
+      "flagged_spans": [],
+      "groundedness_score": 0.97
+    }
+  },
+  "events": [
+    {"elapsed_ms": 0, "type": "status", "status": "EXTRACTING"},
+    {"elapsed_ms": 12000, "type": "status", "status": "ANALYZING"},
+    {"elapsed_ms": 24000, "type": "status", "status": "DRAFTING"},
+    {"elapsed_ms": 36000, "type": "status", "status": "VERIFYING"},
+    {"elapsed_ms": 48000, "type": "status", "status": "AWAITING_APPROVAL"},
+    {"elapsed_ms": 48000, "type": "done", "status": "AWAITING_APPROVAL", "success_prob": 0.61}
+  ]
+}

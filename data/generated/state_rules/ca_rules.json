@@ -1,0 +1,8 @@
+{
+  "state": "CA",
+  "state_name": "California",
+  "internal_days": 180,
+  "external_review_available": true,
+  "external_days": 45,
+  "expedited_days": 3
+}

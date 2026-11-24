@@ -1,0 +1,8 @@
+{
+  "state": "FL",
+  "state_name": "Florida",
+  "internal_days": 365,
+  "external_review_available": true,
+  "external_days": 60,
+  "expedited_days": 3
+}

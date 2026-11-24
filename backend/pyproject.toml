@@ -1,0 +1,76 @@
+[project]
+name = "claimback-backend"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.29",
+    "sqlalchemy[asyncio]>=2.0",
+    "alembic>=1.13",
+    "asyncpg>=0.29",
+    "pgvector>=0.3",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+    "jinja2>=3.1",
+    # Day 2 — agents 3-5 + tracing + tools
+    "ibm-watsonx-ai>=1.1",
+    "tenacity>=8.3",
+    "cryptography>=42.0",
+    "PyYAML>=6.0",
+    # Day 5 — agents 9-13 + SSE
+    "lightgbm>=4.3",
+    "scikit-learn>=1.4",
+    "joblib>=1.4",
+    "sse-starlette>=2.1",
+    # Policy ingest — HTML policy text extraction
+    "beautifulsoup4>=4.12",
+    # Embedded Orchestrate chat — RS256 JWT signing
+    "PyJWT[crypto]>=2.8",
+]
+
+[project.optional-dependencies]
+# Heavy, local-only: PDF parsing fallback (docling pulls in PyTorch) and the
+# synthetic-data PDF renderer. Not installed on Render.  pip install -e ".[pdf]"
+pdf = [
+    "docling>=2.0",
+    "weasyprint>=62",
+]
+dev = [
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "faker>=25",
+    "aiosqlite>=0.20",   # in-memory SQLite for tools-router tests (Day 4)
+]
+observability = [
+    # Optional: install to enable Langfuse tracing
+    "langfuse>=2.0",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["../tests"]

@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & type-check (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend with dev extras
+        run: pip install -e "backend[dev]"
+
+      - name: Ruff lint
+        run: ruff check backend/
+
+      - name: Mypy type-check
+        working-directory: backend
+        run: mypy .
+
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+        env:
+          DATABASE_URL: "postgresql+asyncpg://claimback:claimback@localhost:5432/claimback"
+          PII_VAULT_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+          TOOLS_API_KEY: "test-key"
+          ALLOWED_ORIGINS: "http://localhost:3000"
+
+  frontend:
+    name: Frontend type-check & lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+        working-directory: frontend
+
+      - name: ESLint
+        run: npx next lint
+        working-directory: frontend
+
+  eval-smoke:
+    name: Eval smoke run (Day-3 metrics, no credentials)
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck]
+
+    # Only run when agents or prompts change
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'backend/agents/') ||
+      contains(github.event.pull_request.changed_files, 'prompts/')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend with dev extras
+        run: pip install -e "backend[dev]"
+
+      - name: Ensure evals package is importable
+        run: |
+          if [ ! -f evals/__init__.py ]; then
+            touch evals/__init__.py
+            echo "Created evals/__init__.py"
+          fi
+
+      - name: Run 30-case smoke eval (Day-3, synthetic fixtures, no watsonx)
+        run: python -m evals.run --subset 30 --day3-only
+        env:
+          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          PII_VAULT_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+          TOOLS_API_KEY: "test-key"
+          ALLOWED_ORIGINS: "http://localhost:3000"
+
+      - name: Upload eval results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-smoke-${{ github.run_id }}
+          path: evals/results/
+          retention-days: 30

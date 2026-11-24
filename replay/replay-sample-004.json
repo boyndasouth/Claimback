@@ -1,0 +1,75 @@
+{
+  "case": {
+    "case_id": "replay-sample-004",
+    "status": "AWAITING_APPROVAL",
+    "category": "out_of_network",
+    "success_prob": 0.49,
+    "draft": "## Appeal Letter\n\nDear Horizon Blue Cross Blue Shield,\n\nI am writing to appeal the out-of-network penalty applied to claim #CLM-2024-02387 for emergency services rendered on January 5, 2024 at Riverside General Hospital. [S1]\n\nUnder the No Surprises Act (effective January 1, 2022), patients are protected from out-of-network cost-sharing for emergency services, regardless of whether the facility is in-network. [S2]\n\nThe services rendered constituted emergency care as defined under 42 U.S.C. §300gg-111(a)(3)(C). The patient presented with acute chest pain and was admitted via the emergency department. [S3]\n\nWe request that this claim be reprocessed at the in-network rate.\n\nSincerely,\nDavid Park",
+    "draft_version": 1,
+    "grounding_passed": true
+  },
+  "trace": {
+    "case_id": "replay-sample-004",
+    "agents": [
+      {"agent": "DocumentExtractor", "input_hash": "h8i9j0k1l2m3n4o5", "tokens_in": 465, "tokens_out": 200, "latency_ms": 1360, "cost_usd": 0.000106, "trace_id": "tr-004-ext"},
+      {"agent": "PiiRedactor", "input_hash": "i9j0k1l2m3n4o5p6", "tokens_in": 200, "tokens_out": 206, "latency_ms": 810, "cost_usd": 0.000082, "trace_id": "tr-004-pii"},
+      {"agent": "DenialClassifier", "input_hash": "j0k1l2m3n4o5p6q7", "tokens_in": 206, "tokens_out": 44, "latency_ms": 670, "cost_usd": 0.000034, "trace_id": "tr-004-cls"},
+      {"agent": "PolicyRetriever", "input_hash": "k1l2m3n4o5p6q7r8", "tokens_in": 248, "tokens_out": 300, "latency_ms": 1950, "cost_usd": 0.000115, "trace_id": "tr-004-pol"},
+      {"agent": "CodeValidator", "input_hash": "l2m3n4o5p6q7r8s9", "tokens_in": 0, "tokens_out": 0, "latency_ms": 41, "cost_usd": null, "trace_id": "tr-004-cov"},
+      {"agent": "RegulationDeadline", "input_hash": "m3n4o5p6q7r8s9t0", "tokens_in": 88, "tokens_out": 92, "latency_ms": 695, "cost_usd": 0.000036, "trace_id": "tr-004-reg"},
+      {"agent": "EvidenceBuilder", "input_hash": "n4o5p6q7r8s9t0u1", "tokens_in": 548, "tokens_out": 230, "latency_ms": 1500, "cost_usd": 0.000124, "trace_id": "tr-004-evd"},
+      {"agent": "AppealWriter", "input_hash": "o5p6q7r8s9t0u1v2", "tokens_in": 800, "tokens_out": 420, "latency_ms": 3350, "cost_usd": 0.000206, "trace_id": "tr-004-wrt"},
+      {"agent": "GroundednessChecker", "input_hash": "p6q7r8s9t0u1v2w3", "tokens_in": 420, "tokens_out": 92, "latency_ms": 1180, "cost_usd": 0.000070, "trace_id": "tr-004-grd"},
+      {"agent": "SuccessScorer", "input_hash": "q7r8s9t0u1v2w3x4", "tokens_in": 178, "tokens_out": 88, "latency_ms": 660, "cost_usd": 0.000044, "trace_id": "tr-004-sco"},
+      {"agent": "FollowupTracker", "input_hash": "r8s9t0u1v2w3x4y5", "tokens_in": 62, "tokens_out": 40, "latency_ms": 285, "cost_usd": 0.000018, "trace_id": "tr-004-fup"}
+    ]
+  },
+  "summary": {
+    "explanation": "You were charged out-of-network rates for emergency care at a hospital outside your plan's network. The No Surprises Act (2022) generally prohibits insurers from applying out-of-network cost-sharing for emergency services. This is a strong protection — your insurer is required by federal law to treat emergency care as in-network.",
+    "appeal_plan": {
+      "internal_appeal_deadline": "2024-03-05",
+      "external_review_available": true,
+      "external_review_deadline": "2024-04-05",
+      "expedited_eligible": false,
+      "rule_sources": [
+        {"clause_id": "nsa-2022-emergency", "doc_id": "federal-rules", "section": "No Surprises Act §2799B-1", "text": "A health plan shall not impose a cost-sharing requirement greater than the cost-sharing requirement that would apply for in-network emergency services."}
+      ]
+    },
+    "evidence_checklist": {
+      "items": [
+        {"item_id": "ev-001", "description": "Emergency department admission record showing acute chest pain presentation", "rationale": "Establishes the visit qualified as emergency care under federal definition", "priority": "high"},
+        {"item_id": "ev-002", "description": "Copy of No Surprises Act patient protections notice (must be provided by facility)", "rationale": "Documents statutory obligation", "priority": "high"},
+        {"item_id": "ev-003", "description": "EOB showing the out-of-network differential applied", "rationale": "Quantifies the improperly applied cost-sharing", "priority": "medium"}
+      ]
+    },
+    "code_issues": [],
+    "success_estimate": {
+      "probability": 0.49,
+      "top_factors": [["federal_protection_applicable", 0.33], ["category_out_of_network", -0.15], ["plan_type_marketplace", 0.11]],
+      "explanation": "The No Surprises Act is a strong federal protection for emergency care. However, the insurer may contest the emergency classification. The outcome depends on whether the admission records clearly document an emergent condition."
+    }
+  },
+  "draft": {
+    "case_id": "replay-sample-004",
+    "version": 1,
+    "body_markdown": "## Appeal Letter\n\nDear Horizon Blue Cross Blue Shield,\n\nI am writing to appeal the out-of-network penalty applied to claim #CLM-2024-02387 for emergency services rendered on January 5, 2024 at Riverside General Hospital. [S1]\n\nUnder the No Surprises Act (effective January 1, 2022), patients are protected from out-of-network cost-sharing for emergency services, regardless of whether the facility is in-network. [S2]\n\nThe services rendered constituted emergency care as defined under 42 U.S.C. §300gg-111(a)(3)(C). The patient presented with acute chest pain and was admitted via the emergency department. [S3]\n\nWe request that this claim be reprocessed at the in-network rate.\n\nSincerely,\nDavid Park",
+    "citations": {
+      "S1": {"clause_id": "policy-oon-1.1", "doc_id": "horizon-marketplace-plan", "section": "Section 11.1 — Out-of-Network Benefits", "text": "Out-of-network services are subject to separate deductibles and coinsurance. Emergency services are exempt as required by applicable law."},
+      "S2": {"clause_id": "nsa-2022-emergency", "doc_id": "federal-rules", "section": "No Surprises Act §2799B-1", "text": "A health plan shall not impose a cost-sharing requirement greater than the cost-sharing requirement that would apply for in-network emergency services."},
+      "S3": {"clause_id": "nsa-2022-def-emergency", "doc_id": "federal-rules", "section": "42 U.S.C. §300gg-111(a)(3)(C)", "text": "Emergency medical condition means a medical condition manifesting itself by acute symptoms of sufficient severity such that the absence of immediate medical attention could reasonably be expected to result in placing the patient in serious jeopardy."}
+    },
+    "grounding_report": {
+      "passed": true,
+      "flagged_spans": [],
+      "groundedness_score": 0.97
+    }
+  },
+  "events": [
+    {"elapsed_ms": 0, "type": "status", "status": "EXTRACTING"},
+    {"elapsed_ms": 12000, "type": "status", "status": "ANALYZING"},
+    {"elapsed_ms": 24000, "type": "status", "status": "DRAFTING"},
+    {"elapsed_ms": 36000, "type": "status", "status": "VERIFYING"},
+    {"elapsed_ms": 48000, "type": "status", "status": "AWAITING_APPROVAL"},
+    {"elapsed_ms": 48000, "type": "done", "status": "AWAITING_APPROVAL", "success_prob": 0.49}
+  ]
+}
