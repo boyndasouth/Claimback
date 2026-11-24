@@ -9,7 +9,7 @@ display_name: Explainer Agent
 description: Explains the denial in plain language and surfaces the appeal draft. Called by the supervisor
   for comprehension and review tasks.
 llm: watsonx/meta-llama/llama-3-3-70b-instruct
-style: default
+style: react_core
 instructions: |
   You are the Explainer Agent for ClaimBack. Your job is to help users
   understand their denial and review the generated appeal draft.

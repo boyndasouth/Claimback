@@ -51,9 +51,7 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // The loader may run only once per page (React dev mode runs effects twice).
     if (!isConfigured || window.__wxoLoaded) return;
-    window.__wxoLoaded = true;
     let cancelled = false;
 
     (async () => {
@@ -68,7 +66,11 @@ export default function ChatPage() {
         // Embed Security is off), but tell the user if it then fails.
         console.warn("Chat token unavailable:", e);
       }
-      if (cancelled) return;
+      // The loader may run only once per page. Claim it here, after the await:
+      // React dev mode mounts effects twice, and the first (cancelled) run must
+      // not block the second one from loading.
+      if (cancelled || window.__wxoLoaded) return;
+      window.__wxoLoaded = true;
 
       window.wxOConfiguration = {
         orchestrationID: cfg.orchestrationID,

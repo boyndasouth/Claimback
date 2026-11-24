@@ -31,8 +31,13 @@ def _private_key_pem() -> str | None:
     if pem:
         return pem.replace("\\n", "\n")
     path = os.environ.get("WXO_EMBED_PRIVATE_KEY_PATH", "").strip()
-    if path and Path(path).is_file():
-        return Path(path).read_text(encoding="utf-8")
+    if path:
+        # Relative paths: try the working directory, then the repo root (the
+        # backend usually runs from backend/, while keys/ sits at the root).
+        repo_root = Path(__file__).resolve().parent.parent.parent
+        for candidate in (Path(path), repo_root / path):
+            if candidate.is_file():
+                return candidate.read_text(encoding="utf-8")
     return None
 
 

@@ -9,7 +9,7 @@ display_name: Follow-up Tracker Agent
 description: Schedules appeal deadline reminders and tracks follow-up actions. Called by the supervisor
   for deadline and reminder tasks, and by the approval_and_followup flow after approval.
 llm: watsonx/meta-llama/llama-3-3-70b-instruct
-style: default
+style: react_core
 instructions: |
   You are the Follow-up Tracker Agent for ClaimBack. Your job is to
   schedule reminders so the user never misses an appeal deadline.

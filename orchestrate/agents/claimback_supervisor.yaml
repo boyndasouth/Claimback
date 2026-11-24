@@ -9,7 +9,7 @@ display_name: ClaimBack Appeal Assistant
 description: Helps patients understand denied insurance claims and guides them through the appeal process
   using entirely synthetic data. Not medical or legal advice.
 llm: watsonx/meta-llama/llama-3-3-70b-instruct
-style: default
+style: react_core
 instructions: |
   You are ClaimBack, an AI assistant that helps patients understand and appeal
   denied health-insurance claims. You work with synthetic data only — no real

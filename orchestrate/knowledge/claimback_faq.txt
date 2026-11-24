@@ -1,55 +1,44 @@
-# ClaimBack FAQ — health insurance denials and appeals
+CLAIMBACK FAQ — HEALTH INSURANCE DENIALS AND APPEALS
+====================================================
 
-_General information only, written for a demo that uses synthetic data. Not medical or legal advice._
 
-## What is a health insurance denial?
+General information only, written for a demo that uses synthetic data. Not medical or legal advice.
 
+Q: What is a health insurance denial?
 A denial is a decision by your insurance company not to pay for a medical service, treatment, or prescription. The insurer must provide a written explanation of the reason. You almost always have the right to appeal.
 
-## What is an EOB (Explanation of Benefits)?
-
+Q: What is an EOB (Explanation of Benefits)?
 An Explanation of Benefits (EOB) is a document your insurer sends after a claim is processed. It shows what was billed, what the insurer paid, what you owe, and — if the claim was denied — the reason code. It is not a bill; it is a summary of the insurer's decision.
 
-## What is a CARC or RARC code?
-
+Q: What is a CARC or RARC code?
 CARC (Claim Adjustment Reason Code) and RARC (Remittance Advice Remark Code) are standardised codes insurers use to explain why a claim was adjusted or denied. ClaimBack looks up these codes automatically and translates them into plain language.
 
-## How long do I have to appeal a denial?
-
+Q: How long do I have to appeal a denial?
 Appeal deadlines vary by plan type and state. As a general guide: • Most employer (ERISA) plans: 180 days from the denial date. • Marketplace (ACA) plans: typically 60 days for internal appeal. • Medicare Advantage: 60 days for standard; 72 hours for expedited. Always check your denial letter for the exact deadline specific to your plan. ClaimBack calculates your deadline once you provide the case details.
 
-## What is an internal appeal?
-
+Q: What is an internal appeal?
 An internal appeal is a formal request to your insurer to review their denial decision. It is handled entirely within the insurance company. Most plans require you to exhaust internal appeals before seeking external review.
 
-## What is external review?
-
+Q: What is external review?
 External review (also called independent medical review in some states) lets an independent organisation review your insurer's decision after internal appeals are exhausted. Under the ACA, most plans must offer external review. The external reviewer's decision is binding on the insurer.
 
-## What is an expedited appeal?
-
+Q: What is an expedited appeal?
 An expedited appeal applies when waiting for a standard appeal timeline would seriously jeopardise your health or ability to function. Insurers must respond within 72 hours for expedited internal appeals. Eligibility depends on your plan type and clinical urgency.
 
-## What does 'medical necessity' denial mean?
-
+Q: What does 'medical necessity' denial mean?
 A medical necessity denial means the insurer determined that the service was not medically necessary under their coverage criteria, even if your doctor ordered it. This is one of the most commonly successfully appealed denial categories — supporting documentation from your doctor is usually required.
 
-## What is a prior authorisation denial?
-
+Q: What is a prior authorisation denial?
 Prior authorisation (also called pre-authorisation or pre-approval) is a requirement that your insurer approve certain services before they are provided. If the service was provided without obtaining prior auth first, the insurer may deny the claim. Appeals often succeed if the service was urgent or if the plan's prior auth requirement was not clearly communicated.
 
-## Is ClaimBack providing legal or medical advice?
-
+Q: Is ClaimBack providing legal or medical advice?
 No. ClaimBack is a demo application that uses entirely synthetic data. Nothing it produces constitutes legal or medical advice. Always consult a licensed healthcare professional or patient advocate before filing a real insurance appeal.
 
-## What data does ClaimBack use?
-
+Q: What data does ClaimBack use?
 ClaimBack uses entirely synthetic (fake) data — no real patient records, no real insurers, and no real claims. It is a portfolio demonstration of AI-assisted document processing, not a production medical application.
 
-## What is a CPT code?
-
+Q: What is a CPT code?
 Current Procedural Terminology (CPT) codes are standardised codes maintained by the American Medical Association that describe medical, surgical, and diagnostic services. Insurers use CPT codes to process claims. Incorrect or missing CPT codes are a common source of denials that can be corrected on appeal.
 
-## What is an ICD-10 code?
-
+Q: What is an ICD-10 code?
 ICD-10 (International Classification of Diseases, 10th Revision) codes are standardised codes for diagnoses and conditions. Insurers require that the ICD-10 diagnosis code on a claim supports the treatment being billed. A mismatch between the diagnosis and the procedure is a common coding-error denial.

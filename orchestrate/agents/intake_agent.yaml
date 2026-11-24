@@ -9,7 +9,7 @@ display_name: Intake Agent
 description: Creates a new appeal case and optionally kicks off the analysis pipeline. Called by the supervisor
   when a user wants to start a new appeal.
 llm: watsonx/meta-llama/llama-3-3-70b-instruct
-style: default
+style: react_core
 instructions: |
   You are the Intake Agent for ClaimBack. Your job is to register a new
   appeal case and optionally start the analysis pipeline.

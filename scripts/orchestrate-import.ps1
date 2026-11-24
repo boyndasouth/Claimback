@@ -9,6 +9,7 @@
 
 .EXAMPLE
   .\scripts\orchestrate-import.ps1 -BackendUrl https://claimback-api.onrender.com
+  .\scripts\orchestrate-import.ps1 -BackendUrl https://claimback-api.onrender.com -SkipConnection   # re-run
 
   Prerequisites: `orchestrate env activate <env>` done; backend deployed with
   TOOLS_API_KEY set. You'll be prompted for that same TOOLS_API_KEY value (input
@@ -17,17 +18,34 @@
 param(
   [Parameter(Mandatory = $true)][string]$BackendUrl,
   [string]$AppId = "claimback_api",
-  [switch]$SkipCredentials
+  [switch]$SkipCredentials,
+  # Re-runs: the connection and its credentials already exist
+  [switch]$SkipConnection
 )
 
 $ErrorActionPreference = "Stop"
+# The CLI prints characters like a checkmark; when its output is captured, Python
+# would otherwise encode with the Windows ANSI code page and crash.
+$env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONUTF8 = "1"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
-function Invoke-Step([string]$Title, [scriptblock]$Cmd) {
+function Invoke-Step([string]$Title, [scriptblock]$Cmd, [switch]$AllowError) {
   Write-Host "`n-- $Title " -ForegroundColor Cyan
-  & $Cmd
-  if ($LASTEXITCODE -ne 0) { throw "Step failed: $Title (exit $LASTEXITCODE)" }
+  # The orchestrate CLI can print "[ERROR]" yet exit 0, so check its output too.
+  # (stderr is merged; Continue stops PS 5.1 treating stderr lines as fatal.)
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $Cmd 2>&1 | ForEach-Object { $line = "$_"; Write-Host $line; $line }
+  } finally {
+    $ErrorActionPreference = $prev
+  }
+  if ($AllowError) { return }
+  if ($LASTEXITCODE -ne 0 -or ($output -match "\[ERROR\]")) {
+    throw "Step failed: $Title"
+  }
 }
 
 $BackendUrl = $BackendUrl.TrimEnd("/")
@@ -36,32 +54,36 @@ if ($BackendUrl -notmatch "^https://") {
 }
 
 # 1. Point the OpenAPI spec at the deployed backend (temp copy; repo file untouched)
-$spec = Get-Content "orchestrate/tools/claimback_openapi.json" -Raw | ConvertFrom-Json
-$spec.servers = @(@{ url = $BackendUrl; description = "ClaimBack backend" })
+# Done in Python: Windows PowerShell 5.1 writes UTF-8 *with* a BOM, which the
+# ADK's JSON parser rejects, and its ConvertTo-Json can reshape nested arrays.
 $tmpSpec = Join-Path $env:TEMP "claimback_openapi.json"
-$spec | ConvertTo-Json -Depth 100 | Set-Content -Path $tmpSpec -Encoding utf8
+python scripts/set_openapi_server.py "orchestrate/tools/claimback_openapi.json" $BackendUrl $tmpSpec
+if ($LASTEXITCODE -ne 0) { throw "Could not prepare the tool spec" }
 Write-Host "Tool spec points at $BackendUrl"
 
 # 2. Connection holding the X-API-Key the backend expects (draft + live)
-Invoke-Step "Create connection '$AppId' (ok if it already exists)" {
-  orchestrate connections add -a $AppId
-  $global:LASTEXITCODE = 0
-}
-foreach ($envName in @("draft", "live")) {
-  Invoke-Step "Configure connection for $envName" {
-    orchestrate connections configure -a $AppId --env $envName --type team --kind api_key --name X-API-Key --url $BackendUrl
-  }
-}
-if (-not $SkipCredentials) {
-  $secure = Read-Host "Enter the backend TOOLS_API_KEY (hidden)" -AsSecureString
-  $plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
+if (-not $SkipConnection) {
+  Invoke-Step "Create connection '$AppId' (ok if it already exists)" {
+    orchestrate connections add -a $AppId
+  } -AllowError
   foreach ($envName in @("draft", "live")) {
-    Invoke-Step "Set credentials for $envName" {
-      orchestrate connections set-credentials -a $AppId --env $envName --api-key $plain
+    Invoke-Step "Configure connection for $envName" {
+      orchestrate connections configure -a $AppId --env $envName --type team --kind api_key --name X-API-Key --url $BackendUrl
     }
   }
-  $plain = $null
+  if (-not $SkipCredentials) {
+    $secure = Read-Host "Enter the backend TOOLS_API_KEY (hidden)" -AsSecureString
+    $plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+      [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
+    foreach ($envName in @("draft", "live")) {
+      Invoke-Step "Set credentials for $envName" {
+        orchestrate connections set-credentials -a $AppId --env $envName --api-key $plain
+      }
+    }
+    $plain = $null
+  }
+} else {
+  Write-Host "Skipping connection setup (-SkipConnection)"
 }
 
 # 3. Tools, knowledge base, then agents (collaborators before the supervisor)
